@@ -1,0 +1,13 @@
+.DS_Store
+node_modules/
+diagnostics/
+
+# source footage never enters the repo — fixtures are JSON payloads only
+*.mp4
+*.mov
+*.mkv
+*.webm
+
+# tool-local sidecars
+.impeccable/
+screen/.impeccable/

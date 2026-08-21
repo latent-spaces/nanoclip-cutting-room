@@ -1,0 +1,430 @@
+[
+ {
+  "name": "caption-camera-follow",
+  "type": "component",
+  "title": "Camera Follow Captions",
+  "description": "One sentence written across a world far larger than the frame. Each word is sized against everything already written, so the block grows geometrically and the camera pulls back at a steady rate to keep landing the new word at the same size. Old words stay lit and simply become small.",
+  "tags": [
+   "captions",
+   "caption-style",
+   "camera",
+   "typography",
+   "motion-primitive",
+   "portrait"
+  ]
+ },
+ {
+  "name": "caption-clip-wipe",
+  "type": "component",
+  "title": "Clip Wipe",
+  "description": "Left-to-right clip-path wipe reveal per word",
+  "tags": [
+   "captions",
+   "caption-style",
+   "wipe",
+   "clip-path",
+   "reveal"
+  ]
+ },
+ {
+  "name": "caption-editorial-emphasis",
+  "type": "component",
+  "title": "Editorial Emphasis",
+  "description": "Dual-font system with dramatic size contrast for emphasis words",
+  "tags": [
+   "captions",
+   "caption-style",
+   "editorial",
+   "typography",
+   "emphasis"
+  ]
+ },
+ {
+  "name": "caption-emoji-pop",
+  "type": "component",
+  "title": "Emoji Pop",
+  "description": "Emoji integration with stroked text and horizontal squeeze entrance",
+  "tags": [
+   "captions",
+   "caption-style",
+   "emoji",
+   "social"
+  ]
+ },
+ {
+  "name": "caption-glitch-rgb",
+  "type": "component",
+  "title": "Glitch RGB",
+  "description": "RGB chromatic aberration with CRT scanline overlay",
+  "tags": [
+   "captions",
+   "caption-style",
+   "glitch",
+   "cyber",
+   "tech"
+  ]
+ },
+ {
+  "name": "caption-gradient-fill",
+  "type": "component",
+  "title": "Gradient Fill",
+  "description": "Gradient-clipped text with elastic bounce entrance",
+  "tags": [
+   "captions",
+   "caption-style",
+   "gradient",
+   "colorful"
+  ]
+ },
+ {
+  "name": "caption-highlight",
+  "type": "component",
+  "title": "Highlight",
+  "description": "Red background sweep behind each active word, TikTok-style",
+  "tags": [
+   "captions",
+   "caption-style",
+   "highlight",
+   "social",
+   "tiktok"
+  ]
+ },
+ {
+  "name": "caption-kinetic-slam",
+  "type": "component",
+  "title": "Kinetic Slam",
+  "description": "Full-screen single-word display with alternating entrance directions",
+  "tags": [
+   "captions",
+   "caption-style",
+   "kinetic",
+   "typography",
+   "slam"
+  ]
+ },
+ {
+  "name": "caption-matrix-decode",
+  "type": "component",
+  "title": "Matrix Decode",
+  "description": "Character scramble animation before text reveal",
+  "tags": [
+   "captions",
+   "caption-style",
+   "matrix",
+   "scramble",
+   "decode"
+  ]
+ },
+ {
+  "name": "caption-neon-accent",
+  "type": "component",
+  "title": "Neon Accent",
+  "description": "Multi-color neon glow accents with wiggle drift animation",
+  "tags": [
+   "captions",
+   "caption-style",
+   "neon",
+   "glow",
+   "accent"
+  ]
+ },
+ {
+  "name": "caption-neon-glow",
+  "type": "component",
+  "title": "Neon Glow",
+  "description": "Cyan and magenta neon glow with keyword accent colors",
+  "tags": [
+   "captions",
+   "caption-style",
+   "neon",
+   "glow",
+   "gaming"
+  ]
+ },
+ {
+  "name": "caption-parallax-layers",
+  "type": "component",
+  "title": "Parallax Layers",
+  "description": "Behind-subject 3D text layering with vertical stretch effect",
+  "tags": [
+   "captions",
+   "caption-style",
+   "parallax",
+   "3d",
+   "depth"
+  ]
+ },
+ {
+  "name": "caption-particle-burst",
+  "type": "component",
+  "title": "Particle Burst",
+  "description": "Keyword words trigger colored particle explosions",
+  "tags": [
+   "captions",
+   "caption-style",
+   "particles",
+   "burst",
+   "effects"
+  ]
+ },
+ {
+  "name": "caption-pill-karaoke",
+  "type": "component",
+  "title": "Pill Karaoke",
+  "description": "Pill-shaped container with per-word karaoke color highlight",
+  "tags": [
+   "captions",
+   "caption-style",
+   "karaoke",
+   "pill"
+  ]
+ },
+ {
+  "name": "caption-texture",
+  "type": "component",
+  "title": "Texture",
+  "description": "Flowing texture mask over large uppercase text — ships with 6 textures (lava, marble, metal, wood, concrete, rock), configurable via the texture variable",
+  "tags": [
+   "captions",
+   "caption-style",
+   "texture",
+   "mask"
+  ]
+ },
+ {
+  "name": "caption-weight-shift",
+  "type": "component",
+  "title": "Weight Shift",
+  "description": "Elegant font-weight transition between caption lines",
+  "tags": [
+   "captions",
+   "caption-style",
+   "minimal",
+   "typography"
+  ]
+ },
+ {
+  "name": "directional-wipe",
+  "type": "component",
+  "title": "Directional Wipe",
+  "description": "A directional scene push that slides one panel over another.",
+  "tags": [
+   "transition-primitive"
+  ]
+ },
+ {
+  "name": "fade-through",
+  "type": "component",
+  "title": "Fade Through",
+  "description": "A calm transition primitive that fades one layer out, passes through a wash, and reveals the next layer",
+  "tags": [
+   "motion-primitive",
+   "transition",
+   "fade",
+   "scene"
+  ]
+ },
+ {
+  "name": "beat-accent",
+  "type": "component",
+  "title": "Beat Accent",
+  "description": "A single music-hit sting: impact flash, micro scale-pulse on the subject, immediate decay.",
+  "tags": [
+   "motion-primitive",
+   "effects",
+   "burst",
+   "sting",
+   "emphasize",
+   "impact"
+  ]
+ },
+ {
+  "name": "cta-lockup",
+  "type": "component",
+  "title": "CTA Lockup",
+  "description": "A canonical closing lockup that reveals an action line, pops in an accent CTA capsule, settles supporting microcopy, and holds with confidence.",
+  "tags": [
+   "motion-primitive",
+   "ui-props",
+   "cta",
+   "end-card",
+   "lockup",
+   "ask"
+  ]
+ },
+ {
+  "name": "beat-freeze-cut",
+  "type": "block",
+  "title": "Beat Freeze Cut",
+  "description": "A beat-driven speed ramp, freeze-frame hit, and hard-cut sequence for music-led promos and montages.",
+  "tags": [
+   "transition",
+   "music",
+   "beat-driven",
+   "freeze-frame"
+  ],
+  "dimensions": {
+   "width": 1920,
+   "height": 1080
+  },
+  "duration": 6
+ },
+ {
+  "name": "chromatic-radial-split",
+  "type": "block",
+  "title": "Chromatic Radial Split",
+  "description": "Shader transition with chromatic aberration radial split",
+  "tags": [
+   "transition",
+   "shader"
+  ],
+  "dimensions": {
+   "width": 1920,
+   "height": 1080
+  },
+  "duration": 4
+ },
+ {
+  "name": "cinematic-zoom",
+  "type": "block",
+  "title": "Cinematic Zoom",
+  "description": "Shader transition with dramatic zoom blur",
+  "tags": [
+   "transition",
+   "shader"
+  ],
+  "dimensions": {
+   "width": 1920,
+   "height": 1080
+  },
+  "duration": 4
+ },
+ {
+  "name": "cross-warp-morph",
+  "type": "block",
+  "title": "Cross Warp Morph",
+  "description": "Shader transition with cross-warped morphing",
+  "tags": [
+   "transition",
+   "shader"
+  ],
+  "dimensions": {
+   "width": 1920,
+   "height": 1080
+  },
+  "duration": 4
+ },
+ {
+  "name": "hw-title",
+  "type": "block",
+  "title": "Handwritten Title",
+  "description": "Handwritten display text with a scalar-driven word-by-word highlight sweep and a seeded squiggle underline sized to the text; boils",
+  "tags": [
+   "handwritten",
+   "typography",
+   "title-card",
+   "overlay"
+  ],
+  "dimensions": {
+   "width": 1920,
+   "height": 1080
+  },
+  "duration": 6
+ },
+ {
+  "name": "yt-prism-title",
+  "type": "block",
+  "title": "Chromatic Fringe Title",
+  "description": "Display title on a transparent root: blur-focus entrance, red/blue fringe that settles then breathes, perspective bow, slow scale drift",
+  "tags": [
+   "typography",
+   "title-card",
+   "creator"
+  ],
+  "dimensions": {
+   "width": 1920,
+   "height": 1080
+  },
+  "duration": 6
+ },
+ {
+  "name": "avatar-cloud",
+  "type": "component",
+  "title": "Avatar Cloud",
+  "description": "Lettermark avatars populate a loose elliptical cloud while fine SVG links draw between the community and its central proof label.",
+  "tags": [
+   "effects",
+   "avatars",
+   "community",
+   "network",
+   "social-proof",
+   "prove"
+  ]
+ },
+ {
+  "name": "cta-close",
+  "type": "component",
+  "title": "CTA Close",
+  "description": "A display-scale action line lands per word and fills the frame with air, one generous CTA capsule pops beneath it with a single overshoot, and the finished close holds completely still.",
+  "tags": [
+   "motion-primitive",
+   "ui-props",
+   "cta",
+   "end-card",
+   "close",
+   "ask"
+  ]
+ },
+ {
+  "name": "code-3d-extrude",
+  "type": "block",
+  "title": "Code 3D Extrude",
+  "description": "Syntax-highlighted code on a lit, beveled 3D slab that rotates through real space and settles to a readable rest — true WebGL depth and lighting, not a 2D transform.",
+  "tags": [
+   "code",
+   "code-animation",
+   "3d",
+   "webgl",
+   "developer"
+  ],
+  "dimensions": {
+   "width": 1920,
+   "height": 1080
+  },
+  "duration": 8
+ },
+ {
+  "name": "code-diff",
+  "type": "block",
+  "title": "Code Diff",
+  "description": "An edit shown as a colored diff — removed lines collapse in red, added lines expand in green.",
+  "tags": [
+   "code",
+   "code-animation",
+   "diff",
+   "developer"
+  ],
+  "dimensions": {
+   "width": 1920,
+   "height": 1080
+  },
+  "duration": 6
+ },
+ {
+  "name": "code-highlight",
+  "type": "block",
+  "title": "Code Highlight Sweep",
+  "description": "A highlight band sweeps across a target line while the surrounding context dims — draws the eye to one line.",
+  "tags": [
+   "code",
+   "code-animation",
+   "highlight",
+   "developer"
+  ],
+  "dimensions": {
+   "width": 1920,
+   "height": 1080
+  },
+  "duration": 5
+ }
+]

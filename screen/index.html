@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cutting room — your footage, analyzed live</title>
+<link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!--
+THESIS: the wait IS the demo — one page that narrates a live NanoClip run on the
+visitor's own footage; refuses the dashboard-of-cards and the dead spinner alike.
+OWN-WORLD: NanoClip frosting — warm cream ground (surface-1), cards LIGHTER than
+the page, one hue band 320-10, candy colors as status only, frosting pink #F86685
+for commitment with dark ink on it, Inter Tight negative-tracked + IBM Plex Mono
+machine lines, tinted shadows, long oklch seam ramps, light-locked.
+STORY: the visitor understands what diarization / face clustering / ASD extract
+from THEIR video, picks one caption style and a palette while analyses cook, and
+returns to chat ready to steer the cut.
+FIRST VIEWPORT: header (wordmark · beta · Your kit) over eyebrow 01 + "This is
+what NanoClip sees in your footage." + three explainer cards + nanoclip.ai pill;
+the progress rail rides the right edge, whole run visible, current stage popped.
+FORM: Storyboard Rows — a locked design decision; five numbered beats read as
+one sentence, strips fill with real artifacts left-to-right, the pink
+chase-light is the reveal boundary.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the
+finish review, the verdict, and DESIGN.md.
+-->
+
+<header class="topbar">
+  <a class="wordmark" href="https://nanoclip.ai" aria-label="nanoclip">
+    <img class="mark" src="assets/logo-mark.svg" alt="">
+    <span class="wordmark-text"><span class="nano">nano</span><span class="clip">clip</span></span>
+    <span class="beta-stamp" aria-label="beta">BETA</span>
+  </a>
+  <p class="tagline mono">YOUR FOOTAGE, ANALYZED LIVE</p>
+  <button class="kit-chip" id="kit-chip" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="kit-panel">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1.2 12.1a2 2 0 0 1-2 1.9H9.2a2 2 0 0 1-2-1.9L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+    <span>Your kit</span>
+    <span class="kit-count" id="kit-count" hidden>0</span>
+  </button>
+  <div class="kit-panel" id="kit-panel" hidden>
+    <p class="kit-title">Your kit</p>
+    <div id="kit-items"></div>
+    <p class="kit-empty" id="kit-empty">Your kit is empty — pick a caption style while we cook.</p>
+    <p class="kit-locked mono" id="kit-locked" hidden>KIT LOCKED INTO YOUR CLIPS ✓ · ask in chat to change</p>
+  </div>
+</header>
+
+<main class="page">
+  <div class="content">
+
+    <!-- 01 · beat one: why NanoClip -->
+    <section class="beat" id="beat-1">
+      <p class="eyebrow mono"><span class="eyebrow-num">01</span><span class="eyebrow-sep">·</span>WHAT NANOCLIP SEES</p>
+      <div class="hero-row">
+        <h1 class="hero-title">This is what NanoClip <em>sees</em> in your footage.</h1>
+        <a class="pill" href="https://nanoclip.ai">nanoclip.ai
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="explainers">
+        <article class="explainer">
+          <p class="explainer-kicker mono">DIARIZATION</p>
+          <h2 class="explainer-title">who speaks</h2>
+          <p class="explainer-copy">We find who spoke, and when.</p>
+          <div class="diar-demo" id="diar-demo" aria-hidden="true">
+            <div class="diar-row"><span class="diar-chip">S1</span><span class="diar-wave w1"></span></div>
+            <div class="diar-row"><span class="diar-chip">S2</span><span class="diar-wave w2"></span></div>
+            <div class="diar-row"><span class="diar-chip">S3</span><span class="diar-wave w3"></span></div>
+            <div class="diar-row"><span class="diar-chip">S4</span><span class="diar-wave w4"></span></div>
+          </div>
+          <p class="explainer-note mono" id="diar-note">SCHEMATIC — YOURS LANDS WITH TRANSCRIPT</p>
+        </article>
+        <article class="explainer">
+          <p class="explainer-kicker mono">FACE CLUSTERING</p>
+          <h2 class="explainer-title">who is on screen</h2>
+          <p class="explainer-copy">We group people, across the whole video.</p>
+          <div class="cluster-demo" id="cluster-demo" aria-hidden="true">
+            <div class="cluster-row"><span class="cluster-tag mono">P1</span><i></i><i></i><i></i><i></i></div>
+            <div class="cluster-row"><span class="cluster-tag mono">P2</span><i></i><i></i><i></i></div>
+            <div class="cluster-row"><span class="cluster-tag mono">P3</span><i></i><i></i><i></i><i></i></div>
+          </div>
+          <p class="explainer-note mono" id="cluster-note">SCHEMATIC — YOURS LANDS WITH VISION</p>
+        </article>
+        <article class="explainer">
+          <p class="explainer-kicker mono">ACTIVE SPEAKER DETECTION</p>
+          <h2 class="explainer-title">who speaks right now</h2>
+          <p class="explainer-copy">We track the active speaker in real time.</p>
+          <div class="asd-demo" id="asd-demo" aria-hidden="true">
+            <!-- a two-shot: the frosting box + speaking meter jump between the
+                 two people, so "who speaks right now" needs no caption -->
+            <span class="asd-stage">
+              <span class="asd-person pa"><svg class="asd-head" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 21c0-4.1 3.4-7.5 7.5-7.5s7.5 3.4 7.5 7.5"/></svg></span>
+              <span class="asd-person pb"><svg class="asd-head" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 21c0-4.1 3.4-7.5 7.5-7.5s7.5 3.4 7.5 7.5"/></svg></span>
+              <span class="asd-active"><i class="eq"><b></b><b></b><b></b></i></span>
+            </span>
+          </div>
+          <p class="explainer-note mono" id="asd-note-live">SCHEMATIC — YOURS LANDS WITH VISION</p>
+          <p class="asd-note mono">DRIVES AUTO-REFRAME</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 02 · beat two: the run itself -->
+    <section class="beat" id="beat-2">
+      <p class="eyebrow mono"><span class="eyebrow-num">02</span><span class="eyebrow-sep">·</span>WORKING ON YOUR FOOTAGE</p>
+      <div class="strips" id="strips">
+        <article class="strip" data-stage="upload">
+          <div class="strip-head">
+            <span class="strip-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m6 10 6-6 6 6"/><path d="M4 20h16"/></svg></span>
+            <div class="strip-name">
+              <h3>Upload</h3>
+              <p class="strip-status" data-slot="status">done</p>
+            </div>
+          </div>
+          <div class="strip-body" data-slot="body"></div>
+          <p class="strip-timer mono" data-slot="timer"></p>
+        </article>
+        <article class="strip" data-stage="transcript">
+          <div class="strip-head">
+            <span class="strip-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h14"/></svg></span>
+            <div class="strip-name">
+              <h3>Transcript</h3>
+              <p class="strip-status" data-slot="status"></p>
+            </div>
+          </div>
+          <div class="strip-body" data-slot="body"></div>
+          <p class="strip-timer mono" data-slot="timer"></p>
+        </article>
+        <article class="strip" data-stage="vision">
+          <div class="strip-head">
+            <span class="strip-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+            <div class="strip-name">
+              <h3>Vision</h3>
+              <p class="strip-status" data-slot="status"></p>
+            </div>
+          </div>
+          <div class="strip-body" data-slot="body"></div>
+          <p class="strip-timer mono" data-slot="timer"></p>
+        </article>
+        <article class="strip" data-stage="cast">
+          <div class="strip-head">
+            <span class="strip-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M17.5 14.6c2.1.8 3.5 2.9 3.5 5.4"/></svg></span>
+            <div class="strip-name">
+              <h3>Cast</h3>
+              <p class="strip-status" data-slot="status">waiting</p>
+            </div>
+          </div>
+          <div class="strip-body" data-slot="body"></div>
+          <p class="strip-timer mono" data-slot="timer"></p>
+        </article>
+      </div>
+      <p class="eta mono" id="eta" hidden></p>
+    </section>
+
+    <!-- 03 · beat three: the catalog -->
+    <section class="beat" id="beat-3">
+      <p class="eyebrow mono"><span class="eyebrow-num">03</span><span class="eyebrow-sep">·</span>YOU CHOOSE THE LOOK</p>
+      <div class="shelf-head">
+        <div>
+          <h2 class="shelf-title">Pick a caption style</h2>
+          <p class="shelf-sub">One style carries the whole batch — every spoken word, on every clip.</p>
+        </div>
+        <button class="browse-all" id="browse-all" type="button">Browse all
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </button>
+      </div>
+      <div class="caption-shelf" id="caption-shelf"></div>
+      <div class="shelf-head second">
+        <div>
+          <h2 class="shelf-title">Set the vibe between cuts</h2>
+          <p class="shelf-sub">Pick as many as you like — the edit reaches for them where they fit. Palette is permission, not instruction.</p>
+        </div>
+      </div>
+      <div class="palette-shelf" id="palette-shelf"></div>
+      <p class="catalog-fallback" id="catalog-fallback" hidden>The catalog couldn't load — the registry is unreachable. Pick styles in chat instead; everything else keeps working.</p>
+    </section>
+
+    <!-- 04 · beat four: the cut -->
+    <section class="beat" id="beat-4">
+      <p class="eyebrow mono"><span class="eyebrow-num">04</span><span class="eyebrow-sep">·</span>FINDING THE MOMENTS</p>
+      <div class="cut-zone" id="cut-zone">
+        <div class="cut-placeholders" aria-hidden="true">
+          <span class="cut-slot"></span><span class="cut-slot"></span><span class="cut-slot"></span><span class="cut-slot"></span><span class="cut-slot"></span>
+        </div>
+        <p class="zone-note mono">WE WILL PICK THE BEST MOMENTS</p>
+      </div>
+    </section>
+
+    <!-- 05 · beat five: the clips -->
+    <section class="beat" id="beat-5">
+      <p class="eyebrow mono"><span class="eyebrow-num">05</span><span class="eyebrow-sep">·</span>YOUR CLIPS</p>
+      <div class="clips-zone" id="clips-zone">
+        <p class="zone-note mono">WHEN YOUR CLIPS ARE READY, THIS TURNS INTO YOUR PREVIEW.</p>
+      </div>
+      <p class="next-line" id="next-line">What happens next: <strong>cut → compose</strong> — your clips land right here, playable. Steer everything from chat.</p>
+    </section>
+  </div>
+
+  <!-- The rail — source of truth, not labels -->
+  <aside class="rail" id="rail" aria-label="run progress">
+    <p class="rail-stale mono" id="rail-stale" hidden>CONNECTION LOST — RECONNECTING</p>
+    <ol class="rail-tabs" id="rail-tabs"></ol>
+  </aside>
+</main>
+
+<!-- The footer strip that becomes the commitment band -->
+<footer class="footband" id="footband">
+  <p class="footband-copy" id="footband-copy">
+    <svg class="icon spark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></svg>
+    When your clips are ready, this will turn into your preview.
+  </p>
+  <a class="footband-cta" id="footband-cta" href="#" hidden>Open preview
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+  </a>
+</footer>
+
+<!-- Browse-all overlay: a drawer over the page, never navigation -->
+<div class="overlay" id="overlay" hidden>
+  <div class="overlay-backdrop" id="overlay-backdrop"></div>
+  <div class="overlay-drawer" role="dialog" aria-modal="true" aria-label="Browse the full catalog">
+    <div class="overlay-head">
+      <h2 class="overlay-title">The full catalog</h2>
+      <button class="overlay-close" id="overlay-close" type="button" aria-label="Close">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="overlay-tools">
+      <input class="overlay-search" id="overlay-search" type="search" placeholder="Search styles, transitions, accents…" aria-label="Search the catalog">
+      <div class="overlay-tags" id="overlay-tags"></div>
+    </div>
+    <div class="overlay-grid" id="overlay-grid"></div>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

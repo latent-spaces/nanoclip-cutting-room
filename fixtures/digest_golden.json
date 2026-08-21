@@ -1,0 +1,221 @@
+{
+  "schema": "cutting-room/digest@1",
+  "project_id": "demo_prototype_hour_0000",
+  "language": "en",
+  "duration_s": 600.07,
+  "counts": {
+    "speakers": 6,
+    "utterances": 151,
+    "words": 1210,
+    "face_clusters": 24,
+    "face_tracks": 181,
+    "scene_cuts": 252
+  },
+  "asd": {
+    "ran": true,
+    "reason": null,
+    "assigned": 1637,
+    "carried": 1637,
+    "conf_coverage": 0.51
+  },
+  "cast_candidates": [
+    {"speaker":0,"speaking_s":144.1,"utterance_count":49,"cluster":0,"confidence":0.99,"method":"asd","votes":[[0,379.34],[1,4.11],[2,1.14]],"onscreen_top":[[0,96.2],[1,26.2],[2,10.2]],"onscreen_s":159.8},
+    {"speaker":2,"speaking_s":113.7,"utterance_count":40,"cluster":2,"confidence":0.98,"method":"asd","votes":[[2,343.33],[0,6.19],[1,1.91]],"onscreen_top":[[2,87.2],[0,24.8],[1,10]],"onscreen_s":141.4},
+    {"speaker":1,"speaking_s":70.6,"utterance_count":25,"cluster":1,"confidence":0.98,"method":"asd","votes":[[1,181.55],[2,2.73],[0,0.86],[13,0.48]],"onscreen_top":[[1,45.8],[2,14.6],[0,6]],"onscreen_s":141.2},
+    {"speaker":5,"speaking_s":64.4,"utterance_count":23,"cluster":1,"confidence":0.98,"method":"asd","votes":[[1,177.65],[2,2.19],[0,1.52]],"onscreen_top":[[1,44.6],[0,10.4],[2,9.8]],"onscreen_s":141.2},
+    {"speaker":3,"speaking_s":27.9,"utterance_count":9,"cluster":14,"confidence":0.37,"method":"asd","votes":[[14,13.03],[12,6.56],[16,6.21],[20,4.39]],"onscreen_top":[[14,4.8],[12,2.6],[16,2.2]],"onscreen_s":10.8},
+    {"speaker":4,"speaking_s":14.2,"utterance_count":5,"cluster":11,"confidence":0.33,"method":"asd","votes":[[11,4.85],[7,4.47],[9,2.67],[2,1.52]],"onscreen_top":[[11,2],[7,1.6],[9,1]],"onscreen_s":8.4}
+  ],
+  "timeline_columns": [
+    "start",
+    "end",
+    "speaker",
+    "word_idx",
+    "onscreen",
+    "text"
+  ],
+  "timeline": [
+    [3.1,5.93,2,0,[2],"I did my Marlo Vane for some reason."],
+    [6.69,9.17,4,8,[],"The weird tiny sensor soldered almost it wired."],
+    [11.98,15.3,3,16,[],"Until definitely board wired bounces lever printed seriously the fixed."],
+    [16.03,21.5,1,26,[],"Wobbly built gearbox kettle rusty spring sensor rooftop workshop well. Drone okay the soldered."],
+    [22.31,45.46,0,40,[0],"They brilliant measured printed because it a antenna basement broke workshop this. Antenna terrible gearbox rover beeps backyard okay brilliant magnet. Battery shiny prototype huge bounces kitchen hums obviously. Today today well warehouse. Wired glows built measured because shiny toaster. So that toaster basically literally kettle basement they definitely gadget wobbly kettle."],
+    [46.6,59.55,1,92,[1],"Hallway wired launched pedal kettle built kitchen we glows well rover. Weird rooftop obviously sinks obviously built rattles hums. Gearbox okay brilliant literally unless board works the pedal maybe."],
+    [60.34,72.28,0,121,[0],"I got a DM from a haunted vending machine. Toaster they glorious dropped well rover lever backyard sensor. Pedal until broke fixed dropped kitchen almost while lantern rattles leaks."],
+    [74.69,96.87,0,150,[0],"Rooftop garage so stubborn fixed today. Glorious rover obviously garage. Board right whistle broke antenna it suddenly fails. Fails board rooftop definitely fails huge glows. Kettle workshop we tiny beeps seriously. Gearbox compass rusty obviously turbine workshop bounces magnet because suddenly workshop. Almost we while leaks this spring rover backyard."],
+    [100.04,111.63,1,200,[1],"Weird hallway barely rattles launched shiny floats prototype right basement this. Whistle we rusty because antenna yesterday warehouse a. You kettle definitely hallway glows dropped you toaster measured drone wired."],
+    [114.79,117.48,0,230,[0],"Pedal printed workshop workshop tested look brilliant."],
+    [118.23,127.23,2,237,[2],"Pedal lantern it unless workshop fails seriously almost. Floats obviously soldered bounces spins basically gadget suddenly rattles they. Unless lantern literally wobbly a."],
+    [128.37,130.91,1,260,[],"So lantern kettle honestly basement garage."],
+    [133.95,142.14,1,266,[],"Terrible built until basically sensor dropped. Battery that works until. Pedal gearbox rooftop they works glows we sinks."],
+    [142.99,149.21,0,284,[0],"Tiny lever they finally sensor drone wired. Battery backyard basically brilliant right so dropped."],
+    [149.84,172.34,1,298,[1],"Magnet magnet you basically whistle basically. Barely obviously rooftop drone. Printed this sensor backyard the toaster tiny a. Sensor it the hallway suddenly printed drone but while sensor. Floats terrible this finally we but fails suddenly launched board pedal circuit. Battery definitely barely rattles because hallway gadget kitchen floats kettle terrible."],
+    [173.21,185.53,2,349,[2],"Prototype well soldered well compass printed wired. Rattles hums brilliant finally glorious weird. Pedal kitchen gearbox look toaster terrible broke kitchen soldered tested. Yesterday works a beeps hums suddenly hums tested."],
+    [186.48,193.8,0,380,[],"Rattles brilliant kettle wobbly broke that floats antenna compass. Fails kitchen compass drone almost and whistle dropped."],
+    [194.85,199.3,4,397,[],"Toaster weird basement terrible spins but literally you rooftop lantern shiny that."],
+    [201.49,205.14,2,409,[0],"Glorious wired measured launched launched basically huge shiny wired terrible."],
+    [206.15,212.15,0,419,[8],"Then brilliant they this basically works pedal printed gearbox compass gearbox. They floats circuit rover."],
+    [213.33,216.03,1,434,[1,2],"We built the worst toaster in recorded history."],
+    [216.77,219.62,0,442,[0],"Definitely beeps leaks huge prototype measured hallway spring."],
+    [220.47,224.76,2,450,[0,2],"Built printed this prototype magnet. Turbine wobbly and the then."],
+    [225.64,235.76,1,460,[],"Board until they garage compass rusty toaster. Warehouse warehouse okay rusty brilliant and sensor tested wobbly soldered stubborn. Spins workshop wobbly lantern."],
+    [236.25,241.41,4,482,[11],"Wired backyard well gadget pedal. Honestly today spins tested unless fails."],
+    [241.87,250.55,2,493,[2],"Launched rooftop almost basically rooftop battery rusty sinks rattles. Unless built so lever lever that wired until but. Fixed so turbine lantern."],
+    [251.19,254.34,0,515,[0],"Then built so rooftop backyard almost garage barely hums."],
+    [256.84,269.84,2,524,[2],"Board soldered while gearbox weird wired backyard measured prototype antenna. Bounces sensor measured gearbox suddenly the finally then dropped obviously battery tested. Rattles well because weird lantern unless honestly soldered."],
+    [270.56,275.87,1,554,[2],"Rooftop finally magnet look. Broke and terrible unless antenna right fixed okay today."],
+    [279.14,302.38,0,567,[0],"Sensor yesterday and while because gadget yesterday works finally well works lever. The hallway sinks this spins beeps spins tested so pedal. Then finally rattles hallway the kettle workshop wobbly then magnet beeps. Board unless lantern this that antenna. Lever fixed garage kitchen beeps broke you. Wobbly huge rusty this somehow right until so turbine wired."],
+    [303.41,321.76,2,623,[2],"Shiny somehow this dropped brilliant toaster sensor weird huge bounces rusty while. Pedal glorious a today whistle kitchen launched warehouse while. Sensor broke we unless. Board whistle look measured. Glows fixed finally the tiny dropped somehow stubborn whistle spins whistle built."],
+    [325.23,328.37,0,664,[0,6],"Stubborn warehouse drone pedal works basically measured stubborn because."],
+    [331,332.86,0,673,[],"Wait, play that clip again."],
+    [338.5,340.79,1,678,[],"No way, that thing is real?"],
+    [341.81,355.92,5,684,[1],"That pedal dropped magnet wired finally whistle then rattles. It rooftop but look shiny this. Whistle beeps whistle dropped rover it spring compass wobbly. Battery today antenna seriously glorious bounces spring okay rooftop."],
+    [358.33,360.56,5,717,[1],"Built basically but glows and barely so."],
+    [361.14,374.96,2,724,[2],"Obviously pedal rusty hallway then floats toaster terrible. Dropped antenna today warehouse pedal works weird well. Fails somehow works you right board floats. Basically we dropped bounces fails floats wired because okay whistle you suddenly."],
+    [377.94,384.43,2,759,[2],"Rooftop wobbly hums glorious. Pedal shiny battery whistle sensor seriously tested fixed weird stubborn glorious broke."],
+    [384.86,403.31,5,775,[1],"And they warehouse works antenna gadget prototype this sinks built. It basement tiny it gearbox glorious well a finally stubborn. Drone rover okay board but definitely. Gadget right board antenna maybe works seriously floats garage. Turbine fails seriously leaks weird almost lantern floats."],
+    [403.98,417.32,3,818,[],"Maybe spins stubborn printed toaster circuit basement but brilliant pedal magnet a. Pedal gearbox wired antenna because gearbox while unless. Spring while today while well tiny hums. But basement seriously until."],
+    [420.24,427.18,3,849,[],"Kitchen magnet basement the built. It backyard stubborn sensor the they rusty beeps this hums somehow sensor."],
+    [428.37,448.01,5,866,[1],"Sensor printed pedal battery sensor garage tested wobbly pedal. Tiny glows obviously rover lever. Definitely glorious almost they gearbox lever huge. Measured antenna pedal glorious seriously suddenly look. So lantern okay kitchen magnet today toaster basically. This obviously whistle this kitchen circuit glorious maybe glorious."],
+    [448.99,473.74,0,911,[0],"Sinks antenna brilliant prototype circuit circuit rover somehow backyard. Yesterday but while seriously fixed. Because then weird floats somehow antenna somehow and stubborn well because. Tiny today they they rover. Pedal shiny battery terrible printed obviously. Definitely you that seriously rattles yesterday today glorious. Glorious floats okay fails sensor seriously fixed terrible backyard suddenly right spring."],
+    [474.77,478.28,2,967,[0],"That is the saddest robot I have ever seen."],
+    [479.22,488.41,0,976,[],"Barely stubborn toaster beeps backyard honestly hums backyard finally leaks. Spins magnet beeps rusty. Lever rattles rattles maybe obviously kettle rattles leaks."],
+    [488.78,491.29,5,998,[2],"Measured basically definitely until lantern we brilliant."],
+    [491.93,493.21,2,1005,[0,2],"Whistle drone gearbox somehow."],
+    [495.93,501.96,2,1009,[2],"Built because fails battery. While gearbox and spring beeps while works terrible terrible lever kitchen dropped."],
+    [502.8,506.04,4,1025,[],"Obviously pedal rattles seriously floats terrible beeps beeps barely."],
+    [507.1,508.84,2,1034,[],"Today okay fixed seriously look."],
+    [511.11,517.8,2,1039,[2],"Obviously it antenna so maybe weird fails. Stubborn right almost obviously rooftop obviously sensor somehow that."],
+    [518.13,519.6,5,1055,[1,14],"Warehouse broke obviously glorious."],
+    [519.96,530.79,0,1059,[0],"Wobbly lantern drone finally pedal so fails workshop look. They it basically backyard workshop suddenly rusty built warehouse compass maybe somehow. Battery suddenly works gadget leaks brilliant."],
+    [533.66,536.22,5,1086,[0],"Leaks wobbly until seriously dropped we literally."],
+    [536.86,544.73,3,1093,[],"You well maybe beeps unless we rattles. Spins almost measured toaster right kettle bounces kitchen compass a but while."],
+    [545.25,554.72,5,1112,[1],"Fails pedal then broke beeps sinks obviously somehow antenna kitchen so definitely. Turbine bounces but they whistle okay rover fails circuit basically you compass."],
+    [555.73,560.24,0,1136,[0],"Toaster the lever workshop rooftop obviously magnet tested. Rooftop kitchen glorious compass."],
+    [563.1,572.39,2,1148,[2],"Definitely weird maybe rooftop and okay wired so. It because the it printed finally somehow. Works gadget seriously spring okay floats magnet well."],
+    [574.98,576.35,5,1171,[19,22],"Magnet fails bounces launched."],
+    [579.12,580.89,5,1175,[0],"Whistle maybe backyard lever it lever."],
+    [581.55,588.81,2,1181,[2],"Dropped maybe gearbox and built the barely lantern obviously launched somehow warehouse. And gearbox bounces weird right fails lever."],
+    [589.95,593.74,0,1200,[1],"Whistle they kettle sinks then while board wired look board."]
+  ],
+  "scene_cuts": [
+    3.12, 4.68, 6.45, 9.28, 12.62, 14.13, 16.63, 18.78, 21.03, 23.97, 25.67, 27.73, 30.81, 33.28, 36.35, 38.52, 40.64, 42.85, 45.86, 47.11,
+    49.69, 52.03, 54.32, 57.05, 59.39, 61.94, 63.84, 66.23, 68.3, 70.38, 73.2, 75.3, 78.52, 80.09, 82.91, 85.66, 87.03, 90.65, 92.98, 94.52,
+    96.88, 100.23, 102.34, 104.8, 106.45, 109.14, 111.33, 113.78, 116.5, 118.09, 121.42, 123.28, 126.13, 128.78, 129.86, 132.79, 134.57, 138.21, 140.54, 142.45,
+    144.22, 146.85, 150.08, 152.22, 154.93, 156.2, 159.4, 161.13, 163.1, 166.35, 168.67, 170.95, 172.58, 175.66, 177.88, 180.9, 182.26, 184.58, 187.54, 188.98,
+    192.63, 194.94, 197.62, 199.14, 201.47, 203.82, 206.89, 208.22, 211.41, 212.67, 215.94, 217.78, 219.97, 223.15, 225.45, 228.23, 230.2, 232.52, 234.92, 237.17,
+    240.23, 241.74, 244.48, 247.37, 248.54, 251.85, 253.35, 256.73, 259.2, 261.23, 263.64, 266.09, 268, 270.08, 272.07, 275.69, 277.54, 280.12, 282.09, 283.94,
+    286.67, 289.05, 291.76, 293.81, 296.93, 298.08, 301.55, 302.81, 306.53, 307.75, 310.81, 313.53, 315.48, 318.46, 320.08, 322.03, 324.54, 327.55, 328.88, 332.72,
+    334.85, 336.43, 339.9, 341.27, 343.85, 346.96, 348.23, 350.69, 353.47, 355.19, 357.36, 360.98, 363.47, 364.98, 367.38, 369.78, 371.67, 374.66, 377.4, 379.05,
+    381.13, 383.59, 387.35, 389.39, 392.08, 393.43, 395.71, 397.9, 400.14, 402.55, 404.95, 408.54, 410.96, 412.47, 415.26, 416.74, 419.91, 422.08, 425.33, 427.55,
+    428.67, 431.04, 434.79, 436.99, 439.32, 441.09, 443.4, 445.36, 448.53, 450.86, 452.55, 455.75, 457.93, 459.98, 461.8, 465.36, 466.92, 469.85, 471.74, 474.29,
+    476.84, 478.81, 481.64, 484.47, 486.07, 489.05, 490.74, 493.38, 495.34, 497.85, 500, 503.39, 505.52, 508.11, 509.41, 512.62, 513.9, 516.68, 519.68, 521.58,
+    523.62, 525.88, 529.45, 530.88, 534.19, 536.74, 537.99, 540.4, 543.51, 546.13, 548.44, 549.51, 552.29, 555.11, 557, 559.47, 561.53, 563.75, 566.68, 569.48,
+    571.59, 573.4, 576.19, 579.13, 580.85, 583.2, 585.56, 587.78, 589.86, 592.81, 595.38, 596.98
+  ],
+  "density": {
+    "words_per_min": [
+      121,
+      122,
+      122,
+      124,
+      128,
+      105,
+      127,
+      129,
+      122,
+      110,
+      0
+    ],
+    "silence_gaps": [
+      [
+        9.2,
+        2.8
+      ],
+      [
+        72.3,
+        2.4
+      ],
+      [
+        96.9,
+        3.2
+      ],
+      [
+        111.6,
+        3.2
+      ],
+      [
+        130.9,
+        3
+      ],
+      [
+        199.3,
+        2.2
+      ],
+      [
+        254.3,
+        2.5
+      ],
+      [
+        275.9,
+        3.3
+      ],
+      [
+        321.8,
+        3.5
+      ],
+      [
+        328.4,
+        2.6
+      ],
+      [
+        332.9,
+        5.6
+      ],
+      [
+        355.9,
+        2.4
+      ],
+      [
+        375,
+        3
+      ],
+      [
+        417.3,
+        2.9
+      ],
+      [
+        493.2,
+        2.7
+      ],
+      [
+        508.8,
+        2.3
+      ],
+      [
+        530.8,
+        2.9
+      ],
+      [
+        560.2,
+        2.9
+      ],
+      [
+        572.4,
+        2.6
+      ],
+      [
+        576.4,
+        2.8
+      ]
+    ]
+  },
+  "notes": [
+    "times are seconds on the source-video timeline",
+    "timeline rows follow timeline_columns; onscreen = face clusters visible for at least half the utterance",
+    "word_idx = index of the utterance's first word in the transcript words[] — cite word indices in plan.transcript_edits",
+    "votes are [cluster, weight]: weight = summed speak_conf (method asd) or on-screen seconds during the speaker's utterances (method onscreen_fallback); one voice splitting votes across clusters usually means one person seen from different shots",
+    "scene_cuts are hard cuts (\"use as edit cut points\") — snap clip boundaries to them or to utterance edges, never mid-word",
+    "density.silence_gaps rows are [t, seconds] of dead air >= 2s (longest 20)"
+  ]
+}
