@@ -19,6 +19,31 @@ export const CANONICAL_EDIT_FPS = 30;
 export const REFRAME_SCENE_THRESHOLD = 0.12;
 export const EXTRACT_PAD_S = 5;
 const EOF_CLONE_PAD_MAX_S = 2;
+export const STRAY_FRAMES = 1; // a segment edge this many frames off a local cut is a stray frame, not a choice
+
+// NanoClip's scene times and the proxy's own scdet disagree by a frame now and then;
+// a segment edge that lands ONE frame past (out) or before (in) a local cut then
+// carries a stray frame of the neighbouring scene — the dup-free two-runtime player
+// shows it as a flash. Snap such edges onto the local cut; leave exact hits and real
+// overruns (≥ 2 frames) alone. Returns new segment objects, stamps provenance.
+export function snapSegmentsToCuts(segments, { start, cuts, fps }) {
+  const toFrame = (t) => Math.round((t - start) * fps);
+  // Plan times are 2dp and 1/fps is not: round each edge INTO its scene — an out-point
+  // down, an in-point up — or the rounded time re-admits the stray frame (render
+  // covers a duration with ceil(t × fps) frames; the player shows floor(t × fps)).
+  const outTime = (f) => Math.floor((start + f / fps) * 100 + 1e-6) / 100;
+  const inTime = (f) => Math.ceil((start + f / fps) * 100 - 1e-6) / 100;
+  return segments.map((seg) => {
+    const out = { ...seg };
+    const fIn = toFrame(seg.src_in);
+    const fOut = toFrame(seg.src_out);
+    const tail = cuts.find((c) => fOut - c >= 1 && fOut - c <= STRAY_FRAMES);
+    if (tail !== undefined) { out.src_out = outTime(tail); out.snapped_out = 'local_cut'; }
+    const head = cuts.find((c) => c - fIn >= 1 && c - fIn <= STRAY_FRAMES);
+    if (head !== undefined) { out.src_in = inTime(head); out.snapped_in = 'local_cut'; }
+    return out;
+  });
+}
 
 const round = (v) => Math.round(v * 100) / 100;
 
@@ -276,6 +301,15 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const pad = flag('pad') !== undefined ? Number(flag('pad')) : EXTRACT_PAD_S;
     const duration = plan.source?.duration_s;
     const extracted = [];
+    const snapEdges = (clip, ex) => {
+      const snapped = snapSegmentsToCuts(clip.segments, { start: ex.start, cuts: ex.cuts ?? [], fps: ex.fps });
+      snapped.forEach((seg, i) => {
+        const was = clip.segments[i];
+        if (seg.src_out !== was.src_out) console.error(`${clip.id}: segment ${i} out ${was.src_out} → ${seg.src_out} (local cut)`);
+        if (seg.src_in !== was.src_in) console.error(`${clip.id}: segment ${i} in ${was.src_in} → ${seg.src_in} (local cut)`);
+      });
+      return snapped;
+    };
     for (const clip of workClips) {
       const lo = Math.min(...clip.segments.map((s) => s.src_in));
       const hi = Math.max(...clip.segments.map((s) => s.src_out));
@@ -284,7 +318,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       const priorFile = prior && join(projectDir, prior.file);
       const covered = prior && existsSync(priorFile)
         && prior.start <= lo && hi <= prior.start + prior.frames / CANONICAL_EDIT_FPS;
-      if (covered && !argv.includes('--force')) continue;
+      if (covered && !argv.includes('--force')) {
+        // the proxy stands, but a moved edge can still sit a stray frame off a
+        // known local cut (iterate.md §1 re-runs extract after boundary edits)
+        clip.segments = snapEdges(clip, prior);
+        continue;
+      }
       const start = round(Math.max(0, lo - pad));
       const end = duration ? Math.min(duration, hi + pad) : hi + pad;
       const len = round(end - start);
@@ -319,6 +358,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         ...(clip.composition ?? { status: 'none', path: null }),
         extract: { file: 'assets/clip30.mp4', start, fps: CANONICAL_EDIT_FPS, frames, cuts },
       };
+      clip.segments = snapEdges(clip, clip.composition.extract);
       extracted.push(clip.id);
     }
     writeAtomic(planPath, JSON.stringify(plan, null, 2) + '\n');

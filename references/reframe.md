@@ -26,6 +26,8 @@ below. THIS DOCUMENT IS NOW LAW.
    default 30). Any mapping between the two timebases lands a cut mid-frame somewhere —
    an off-by-one frame that shows as a visible glitch at the switch — one frame too
    early on one side of the cut, one frame too late on the other. So:
+   - Segment edges are then reconciled with the PROXY's cuts, not NanoClip's: an edge
+     one frame off a local cut is a stray frame, and `extract` snaps it (compose.md).
    - Transcode ONCE per input to a 30fps-exact local working copy (wall-clock times
      preserved — word/face timestamps stay valid; reuse the intake stage's mezzanine
      transcode machinery).

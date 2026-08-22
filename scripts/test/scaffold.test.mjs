@@ -5,7 +5,7 @@ import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, writeFileS
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { scaffoldComposition } from '../scaffold.mjs';
+import { scaffoldComposition, snapSegmentsToCuts } from '../scaffold.mjs';
 
 const SCAFFOLD_CLI = fileURLToPath(new URL('../scaffold.mjs', import.meta.url));
 
@@ -170,6 +170,66 @@ test('CLI extract --dir: clip window becomes an exact-30fps CFR proxy with its o
   assert.equal(Number(stream.nb_frames), 90);
   // the red→blue cut at source 2.0 lands at extract-time 1.5 → frame 45, found on the proxy
   assert.deepEqual(ex.cuts, [45]);
+});
+
+test('CLI extract: a segment edge one frame off a LOCAL cut snaps onto it (stray frame)', () => {
+  // NanoClip's scene time and the proxy's own scdet can disagree by a frame: the
+  // segment then carries one stray frame of the neighbouring scene at its edge.
+  const rundir = seedExtractRundir('cr-ex-snap-', [
+    { src_in: 1, src_out: 2.03 },      // out-point one frame PAST the cut at 2.0 → tail stray
+    { src_in: 1.97, src_out: 3 },      // in-point one frame BEFORE the cut → head stray
+  ]);
+  const res = spawnSync('node', [SCAFFOLD_CLI, 'extract', '--dir', rundir, '--pad', '0.5'], { encoding: 'utf8' });
+  assert.equal(res.status, 0, res.stderr);
+  const segs = JSON.parse(readFileSync(join(rundir, 'plan.json'), 'utf8')).clips[0].segments;
+  assert.equal(segs[0].src_out, 2, 'tail snapped back onto the local cut');
+  assert.equal(segs[0].snapped_out, 'local_cut');
+  assert.equal(segs[1].src_in, 2, 'head snapped forward onto the local cut');
+  assert.equal(segs[1].snapped_in, 'local_cut');
+  assert.match(res.stderr, /c1: segment 0 out 2\.03 → 2 \(local cut\)/);
+});
+
+test('snapSegmentsToCuts: a cut off the 2dp grid rounds INTO the scene on both edges', () => {
+  // cut frame 46 at start 0.5 → 2.0333…: the out-point floors (2.03 → ceil(1.53×30)=46
+  // frames, last sampled frame 45 = before the cut), the in-point ceils (2.04 → the
+  // player's floor(1.54×30)=46 = the cut frame itself, never 45)
+  const [a, b] = snapSegmentsToCuts([
+    { src_in: 0.5, src_out: 2.07 },   // one frame past frame 46 (2.0667 → frame 47)
+    { src_in: 2.0, src_out: 3 },      // one frame before frame 46 (2.0 → frame 45)
+  ], { start: 0.5, cuts: [46], fps: 30 });
+  assert.equal(a.src_out, 2.03);
+  assert.equal(Math.ceil((a.src_out - a.src_in) * 30 - 1e-6), 46);
+  assert.equal(b.src_in, 2.04);
+  assert.equal(Math.floor((b.src_in - 0.5) * 30), 46);
+});
+
+test('CLI extract: a covered re-run still snaps a moved edge onto the known local cut', () => {
+  const rundir = seedExtractRundir('cr-ex-snap2-', [{ src_in: 1, src_out: 3 }]);
+  assert.equal(spawnSync('node', [SCAFFOLD_CLI, 'extract', '--dir', rundir, '--pad', '0.5'], { encoding: 'utf8' }).status, 0);
+  const planPath = join(rundir, 'plan.json');
+  const plan = JSON.parse(readFileSync(planPath, 'utf8'));
+  plan.clips[0].segments = [{ src_in: 1, src_out: 2.03 }]; // a chat edit lands one frame past the cut
+  writeFileSync(planPath, JSON.stringify(plan));
+  const res = spawnSync('node', [SCAFFOLD_CLI, 'extract', '--dir', rundir, '--pad', '0.5'], { encoding: 'utf8' });
+  assert.equal(res.status, 0, res.stderr);
+  assert.deepEqual(JSON.parse(res.stdout).extracted, [], 'proxy reused');
+  const seg = JSON.parse(readFileSync(planPath, 'utf8')).clips[0].segments[0];
+  assert.equal(seg.src_out, 2);
+  assert.equal(seg.snapped_out, 'local_cut');
+});
+
+test('snapSegmentsToCuts: only a one-frame miss snaps; real gaps and exact hits are untouched', () => {
+  const cuts = [45]; // proxy frames, start 0.5 → cut at source 2.0
+  const segs = snapSegmentsToCuts([
+    { src_in: 1, src_out: 2.1 },    // 3 frames past the cut: an intended overrun, keep
+    { src_in: 1, src_out: 2 },      // exact hit, keep (and no stamp)
+    { src_in: 1, src_out: 2.03 },   // one frame past → snap
+  ], { start: 0.5, cuts, fps: 30 });
+  assert.equal(segs[0].src_out, 2.1);
+  assert.equal(segs[1].src_out, 2);
+  assert.equal(segs[1].snapped_out, undefined);
+  assert.equal(segs[2].src_out, 2);
+  assert.equal(segs[2].snapped_out, 'local_cut');
 });
 
 test('CLI extract: window clamps at t=0 and the EOF clone pad fills a window past the end', () => {

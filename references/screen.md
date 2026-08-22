@@ -133,6 +133,14 @@ still catalog@1).
 - Restarting server or watcher is always safe: state.json persists, `get --wait` on a
   completed analysis returns immediately, extraction is idempotent.
 
+## Capturing the page (process shots, README media)
+
+Capture by ELEMENT, never by scroll offset: beat 05 embeds the clip players
+(iframes that load async and resize) — a fixed `clip:{y}` or `scrollTo(y)` taken before
+they settle lands on the wrong beat. Wait for `#beat-5 iframe` to be attached and
+`networkidle`, then `locator('#beat-5').screenshot()` (playwright) — the element's own
+box at capture time. Full-page shots are fine only before clips land.
+
 ## Dev & demo
 
 `node scripts/replay.mjs --dir <rundir> [--speed 8] [--source <video>] [--finale]`
