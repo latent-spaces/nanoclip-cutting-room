@@ -13,6 +13,15 @@ This skill is the editor between them. The promise: point it at a recording, app
 quote measured in cents, get three shorts you'd actually post, ask for more in plain
 language.
 
+## Where things live
+
+- **Skill folder** — the directory holding this `SKILL.md` (typically
+  `~/.claude/skills/nanoclip-cutting-room`). Every `node scripts/<x>.mjs` in this file and
+  in `references/` is relative to it: run `node <skill folder>/scripts/<x>.mjs` from wherever
+  you are. Never copy the scripts next to the footage.
+- **Working folder** — the folder holding the user's footage (usually the cwd). All run
+  output goes to `<working folder>/cutting-room/` (`plan.json`, data, drafts, renders).
+
 ## The flow
 
 ```

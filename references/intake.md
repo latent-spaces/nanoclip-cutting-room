@@ -19,10 +19,11 @@ If `cutting-room/plan.json` already exists in the working folder:
 ## 0 · Preflight
 
 ```
-node scripts/preflight.mjs
+node <skill folder>/scripts/preflight.mjs
 ```
 
-Run this first in a fresh session. It verifies node (20+) and ffmpeg/ffprobe, installs
+Run this first in a fresh session, from the working folder (every `node scripts/…` in
+this playbook is relative to the skill folder — see SKILL.md · Where things live). It verifies node (20+) and ffmpeg/ffprobe, installs
 the `nanoclip` CLI from npm when it is missing, reports the cached auth state, and warms
 the pinned `hyperframes` version so the first render never stalls on a download. JSON
 verdict on stdout, human report on stderr; exit 0 = ready.

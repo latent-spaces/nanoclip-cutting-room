@@ -13,6 +13,7 @@ costs no tokens. Unit tests ride with each script: `node --test 'scripts/test/*.
 | `server.mjs` | the Screen's entire API: static page + SSE (`state/style/catalog.json`) + `POST /choices` → `style.json`; loopback only |
 | `catalog.mjs` | `hyperframes catalog --json` → shorts shelves (caption-style / transitions / accent blocks), prefs-usage sort, house picks, `catalog.json` |
 | `replay.mjs` | replays the recorded run from `fixtures/` on a compressed timeline (dev/demo; `--finale` simulates the clips-ready finale) |
+| `demo.mjs` | the keyless demo in one command: server + replay + opens the browser (`--no-open`, `--dir`, `--speed`) |
 | `reframe.mjs` | `shots`: deterministic camera-state derivation — extract cuts × transcript turns × face boxes × plan.cast → `plan.clips[].reframe.shots` (solo/split/centered per shot, normalized face crops + zoom) |
 | `scaffold.mjs` | `extract`: per-clip 30fps CFR proxy + scene cuts detected on it (reference pipeline) · `build`: one 9:16 HF project per clip riding its proxy (framework-owned media, rebased `data-media-start` trims), Composer-ready paused timeline |
 | `digest.mjs` | the token firewall: `build` (speaker×cluster fusion join + turn timeline → `data/digest.json`, ≤20KB golden-tested; long footage auto-shards to an index + `digest.d/seg-NN.json` slices) · `thumbs` (cast face crops via ffmpeg, tolerant) · `locate` (word range → exact source times) |

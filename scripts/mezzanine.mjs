@@ -5,7 +5,7 @@
 // Zero-dep node; ffprobe/ffmpeg and the nanoclip CLI are the only external tools.
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { loadPrefs, recordTranscodeSpeed, recordUploadSpeed, defaultPrefsPath } from './prefs.mjs';
@@ -207,6 +207,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const [cmd, arg1, arg2] = argv;
   let result;
   if (cmd === 'probe' && arg1) {
+    if (!existsSync(arg1)) {
+      console.error(`no such file or folder: ${arg1}`);
+      process.exit(2);
+    }
     result = statSync(arg1).isDirectory() ? await listCandidates(arg1) : await probeFile(arg1);
   } else if (cmd === 'decide' && arg1) {
     const stats = await probeFile(arg1);

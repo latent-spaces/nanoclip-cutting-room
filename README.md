@@ -74,43 +74,36 @@ claude  Finisher gate passed. Three vertical .mp4s rendered locally —
 
 ## Quick start
 
-```bash
-git clone https://github.com/latent-spaces/nanoclip-cutting-room.git
-cd nanoclip-cutting-room
-node scripts/preflight.mjs
-nanoclip auth login
+Open Claude Code and paste:
+
+```text
+install the skill from github.com/latent-spaces/nanoclip-cutting-room into ~/.claude/skills, then cut ~/footage/ep7.mp4 into shorts
 ```
 
-Preflight verifies node 20+ and ffmpeg, installs the
-[NanoClip CLI](https://www.npmjs.com/package/nanoclip) from npm when it is
-missing, and warms the pinned HyperFrames version. The key comes from
-[nanoclip.ai](https://nanoclip.ai) — `nanoclip auth login` opens a sign-in
-link. Auth is your step — the skill never touches the key.
+That is the whole setup. Claude clones the skill, checks the machine (node 20+,
+ffmpeg — installs the [NanoClip CLI](https://www.npmjs.com/package/nanoclip)
+from npm when it is missing), tells you if `nanoclip auth login` is needed,
+quotes the spend in cents, and waits for your approval. Prefer your own hands:
 
-Then open the folder in Claude Code and say what you want:
+```bash
+git clone https://github.com/latent-spaces/nanoclip-cutting-room.git ~/.claude/skills/nanoclip-cutting-room
+```
 
-> turn this podcast into verticals — ~/footage/ep7.mp4
-
-Claude loads `SKILL.md`, walks the stage playbooks in `references/`, and asks
-before spending.
+The key comes from [nanoclip.ai](https://nanoclip.ai). Auth is your step — the
+skill never touches the key.
 
 ## Try it with nothing
 
-No key, no account, no spend — replay a complete run from the synthetic
-fixtures through the real Screen. Two terminals:
+No key, no account, no spend — one command replays a complete run from the
+synthetic fixtures through the real Screen:
 
 ```bash
-node scripts/server.mjs --dir /tmp/demo-run --port 4816
+node scripts/demo.mjs
 ```
 
-```bash
-node scripts/replay.mjs --dir /tmp/demo-run --speed 8 --finale
-```
-
-Open http://127.0.0.1:4816 and watch "The Prototype Hour" — an invented
-panel show, generated deterministically by `scripts/make-demo-fixtures.mjs` —
-land beat by beat, ending with three proposed clips. No real people anywhere
-in the repo.
+The browser opens on "The Prototype Hour" — an invented panel show, generated
+deterministically by `scripts/make-demo-fixtures.mjs` — landing beat by beat
+and ending with three proposed clips. No real people anywhere in the repo.
 
 ## How it works
 
@@ -134,7 +127,7 @@ NanoClip runs in your browser or in Claude Code. This is the Claude Code half.
 SKILL.md        the router Claude Code loads
 references/     per-stage playbooks — intake, screen, digest, editorial, compose, reframe, iterate
 scripts/        zero-dependency node — preflight, mezzanine, prefs, watcher, server, catalog,
-                replay, digest (+ gap frames), reframe, scaffold (+ extract), captions, render,
+                replay, demo, digest (+ gap frames), reframe, scaffold (+ extract), captions, render,
                 verification tools (switch-scan, switch-lab, player-probe) · tests in scripts/test/
 screen/         the Screen page (static HTML/CSS/JS served by scripts/server.mjs)
 agents/         Composer / Finisher agent definitions
