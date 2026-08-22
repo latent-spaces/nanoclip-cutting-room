@@ -8,6 +8,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { exact2 } from './grid.mjs';
 
 export const RENDER_FPS = 30;
 // Product decision: pin the toolchain — npx floats broke reproducibility
@@ -16,7 +17,6 @@ export const RENDER_FPS = 30;
 export const HYPERFRAMES_PKG = 'hyperframes@0.8.4';
 export const outputName = (id, quality) => `${id}-${quality === 'high' ? 'final' : 'draft'}.mp4`;
 
-const round2 = (v) => Math.round(v * 100) / 100;
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const argv = process.argv.slice(2);
@@ -75,7 +75,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     // clean. The renderer COVERS the full duration — frame count is ceil(total x fps)
     // (measured: 48.34s -> 1451 frames, not round()'s 1450); epsilon strips float
     // noise so exact multiples never ceil one frame up.
-    const total = round2(clip.segments.reduce((s, g) => s + (g.src_out - g.src_in), 0));
+    const total = exact2(clip.segments.reduce((s, g) => s + (g.src_out - g.src_in), 0));
     const wantFrames = Math.ceil(total * RENDER_FPS - 1e-6);
     const probe = spawnSync('ffprobe', [
       '-v', 'error', '-select_streams', 'v:0', '-count_frames',

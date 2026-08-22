@@ -7,6 +7,7 @@
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { exact2 } from './grid.mjs';
 
 export const CUE_MAX_WORDS = 4;   // shorts convention: 3-4 word lines
 export const CUE_GAP_S = 0.8;     // dead air that starts a fresh cue
@@ -15,7 +16,6 @@ export const CUE_YIELD_S = 0.05;  // clearance before the next cue takes over (o
 export const CUE_MIN_WORD_S = 0.08; // a word's highlight window never collapses (zero-length words)
 export const DEFAULT_CAPTION_STYLE = 'caption-highlight';
 
-const round2 = (v) => Math.round(v * 100) / 100;
 // Hebrew + Arabic ranges incl. presentation forms — a cue with any strong RTL run renders RTL
 const RTL_RE = /[֐-ࣿיִ-﷿ﹰ-﻿]/;
 
@@ -28,10 +28,10 @@ export function deriveCues(clip, words) {
     let cue = null;
     for (const w of words) {
       if (w.start < seg.src_in || w.start >= seg.src_out) continue;
-      const start = round2(base + (w.start - seg.src_in));
+      const start = exact2(base + (w.start - seg.src_in));
       // zero/near-zero-length words (NanoClip emits them on punctuation) would never
       // highlight: floor the window, never past the segment end
-      const end = round2(base + (Math.min(Math.max(w.end, w.start + CUE_MIN_WORD_S), seg.src_out) - seg.src_in));
+      const end = exact2(base + (Math.min(Math.max(w.end, w.start + CUE_MIN_WORD_S), seg.src_out) - seg.src_in));
       const fresh = !cue
         || w.speaker !== cue.speaker
         || start - cue.words.at(-1).end >= CUE_GAP_S - 1e-9
@@ -42,7 +42,7 @@ export function deriveCues(clip, words) {
       }
       cue.words.push({ text: w.text, start, end });
     }
-    base = round2(base + (seg.src_out - seg.src_in));
+    base = exact2(base + (seg.src_out - seg.src_in));
   }
   const total = base;
   cues.forEach((cue, i) => {
@@ -50,7 +50,7 @@ export function deriveCues(clip, words) {
     // the yield comes out of the hold, never out of the last word: a cue that
     // hides before its own last word ends clips the punchline's highlight
     const lastEnd = cue.words.at(-1).end;
-    cue.end = round2(Math.min(
+    cue.end = exact2(Math.min(
       lastEnd + CUE_HOLD_S,
       next ? Math.max(next.start - CUE_YIELD_S, lastEnd) : Infinity,
       total,

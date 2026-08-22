@@ -83,7 +83,13 @@ render.mjs; an upgrade = bump it deliberately, re-run both spikes + switch-scan)
 grid), where it recovers the exact decimal from float noise — that is noise-stripping,
 not precision loss. (c) `<video>` elements carry NO `class="clip"` (hyperframes-core
 data-attributes.md: clip class is for div/img; the framework manages video visibility
-directly) — verified: check passes, all switches scan clean, zero black intervals.**
+directly) — verified: check passes, all switches scan clean, zero black intervals.
+(d) The same rule holds INSIDE plan.json: a segment edge snapped onto a local cut
+(`scaffold.mjs extract`, compose.md) is stored as the exact grid double
+(`89.42666666666668`), never its 2dp neighbour — and every consumer goes through
+`exact2` (scripts/grid.mjs): noise-strip a 2dp-true value, pass a grid value
+untouched. Measured: the 2dp neighbour (89.43) re-admitted the stray frame
+(ceil(1106.1) = 1107 render frames); the exact double renders 1106.**
 
 The fix (scaffold.mjs `gridStart`/`gridEnd`/`shotWindow`): every shot window starts at
 **(f0−0.25)/30** (shot 0 at the origin) and its render-relevant end is **(f1−0.25)/30**

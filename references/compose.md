@@ -17,9 +17,11 @@ Idempotent while segments stay inside the window; boundary tweaks within the pad
 no re-extract. **Segment edges snap to the local cuts:** an in/out point exactly ONE
 frame off a cut on the proxy (NanoClip's scene time and the proxy's scdet disagree by a
 frame now and then) carried a stray frame of the neighbouring scene — a flash at the
-seam. `extract` moves such an edge onto the cut (also on covered re-runs, so chat
-boundary edits get it too), says so on stderr, and stamps `snapped_in/out: "local_cut"`.
-Exact hits and ≥2-frame overruns are left alone — those are choices.
+seam. `extract` moves such an edge onto the cut's EXACT grid time (a long double in
+plan.json is correct, never round it — reframe.md float law (d); also on covered
+re-runs, so chat boundary edits get it too), says so on stderr, and stamps
+`snapped_in/out: "local_cut"`. Exact hits and ≥2-frame overruns are left alone —
+those are choices.
 
 One standalone HyperFrames project per `proposed`/`approved` clip → `compose/<id>/`:
 9:16 root (1080×1920) per the hyperframes-core minimal-composition contract, one muted

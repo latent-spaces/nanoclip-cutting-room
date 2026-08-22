@@ -10,6 +10,7 @@ import { copyFileSync, existsSync, linkSync, mkdirSync, readFileSync, renameSync
 import { isAbsolute, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { cropPx } from './reframe.mjs';
+import { exact2 } from './grid.mjs';
 
 export const COMPOSE_WIDTH = 1080;
 export const COMPOSE_HEIGHT = 1920;
@@ -28,19 +29,17 @@ export const STRAY_FRAMES = 1; // a segment edge this many frames off a local cu
 // overruns (≥ 2 frames) alone. Returns new segment objects, stamps provenance.
 export function snapSegmentsToCuts(segments, { start, cuts, fps }) {
   const toFrame = (t) => Math.round((t - start) * fps);
-  // Plan times are 2dp and 1/fps is not: round each edge INTO its scene — an out-point
-  // down, an in-point up — or the rounded time re-admits the stray frame (render
-  // covers a duration with ceil(t × fps) frames; the player shows floor(t × fps)).
-  const outTime = (f) => Math.floor((start + f / fps) * 100 + 1e-6) / 100;
-  const inTime = (f) => Math.ceil((start + f / fps) * 100 - 1e-6) / 100;
+  // The snapped edge is the cut's exact grid time — never rounded to the plan's 2dp
+  // (the float law): rounding to nearest is how the stray frame got in.
+  const atCut = (f) => start + f / fps;
   return segments.map((seg) => {
     const out = { ...seg };
     const fIn = toFrame(seg.src_in);
     const fOut = toFrame(seg.src_out);
     const tail = cuts.find((c) => fOut - c >= 1 && fOut - c <= STRAY_FRAMES);
-    if (tail !== undefined) { out.src_out = outTime(tail); out.snapped_out = 'local_cut'; }
+    if (tail !== undefined) { out.src_out = atCut(tail); out.snapped_out = 'local_cut'; }
     const head = cuts.find((c) => c - fIn >= 1 && c - fIn <= STRAY_FRAMES);
-    if (head !== undefined) { out.src_in = inTime(head); out.snapped_in = 'local_cut'; }
+    if (head !== undefined) { out.src_in = atCut(head); out.snapped_in = 'local_cut'; }
     return out;
   });
 }
@@ -58,8 +57,9 @@ const escapeHtml = (s) => String(s)
 // glitched). Quarter-frame margins put every window edge half-way between samples,
 // and land media seeks mid-frame-interval instead of on a PTS boundary.
 // Product decision: never round grid-valued (1/30) numbers — emit the exact
-// double (String = shortest round-trip). round() below is reserved for 2dp-TRUE
-// values (NanoClip word grid), where it recovers the exact decimal from float noise.
+// double (String = shortest round-trip). Segment-derived times go through exact2
+// (grid.mjs): 2dp-true values lose their float noise, grid values pass untouched.
+// round() below is for chosen values only (the extract window's padded start).
 // Shot windows live on the quarter-frame grid: start (f0 - 0.25)/30 (shot 0 from the
 // origin), end (f1 - 0.25)/30 — no boundary ever sits on a render sample t = k/30, so the
 // render covers frames f0..f1-1 exactly once and the runtime's end-of-window media clamp
@@ -99,7 +99,7 @@ const shotMedia = (clip, source, mediaOffset, width, height) => {
   return clip.reframe.shots.map((shot, k) => {
     const seg = [...segBases].reverse().find((b) => shot.f0 >= b.base);
     // 2dp-true part noise-stripped, grid part exact — never rounded (see decision above)
-    const mediaStart = String(round(seg.srcIn - mediaOffset) + (shot.f0 - seg.base) / 30);
+    const mediaStart = String(exact2(seg.srcIn - mediaOffset) + (shot.f0 - seg.base) / 30);
     const win = shotWindow(shot.f0, shot.f1, k === clip.reframe.shots.length - 1);
     const timing = `data-start="${win.start}" data-duration="${win.duration}" data-media-start="${mediaStart}"`;
     return shot.panes.map((pane, j) => {
@@ -171,11 +171,11 @@ const captionMounts = (clip) => {
 // One standalone composition (hyperframes-core minimal-composition contract):
 // sized root, data-start="0", one paused timeline registered under the clip id.
 export function scaffoldComposition(clip, { source, mediaOffset = 0, width = COMPOSE_WIDTH, height = COMPOSE_HEIGHT } = {}) {
-  const segs = clip.segments.map((s) => ({ ...s, dur: round(s.src_out - s.src_in) }));
-  const total = round(segs.reduce((sum, s) => sum + s.dur, 0));
+  const segs = clip.segments.map((s) => ({ ...s, dur: exact2(s.src_out - s.src_in) }));
+  const total = exact2(segs.reduce((sum, s) => sum + s.dur, 0));
   let t = 0;
   const audio = segs.map((s, i) => {
-    const startAttr = `data-start="${round(t)}" data-duration="${s.dur}" data-media-start="${round(s.src_in - mediaOffset)}"`;
+    const startAttr = `data-start="${exact2(t)}" data-duration="${s.dur}" data-media-start="${exact2(s.src_in - mediaOffset)}"`;
     t += s.dur;
     return `      <audio id="${clip.id}-a${i}" src="${source}" ${startAttr} data-track-index="10" data-volume="1"></audio>`;
   }).join('\n');
@@ -183,7 +183,7 @@ export function scaffoldComposition(clip, { source, mediaOffset = 0, width = COM
   const media = clip.reframe?.shots?.length
     ? `${shotMedia(clip, source, mediaOffset, width, height)}\n${audio}`
     : segs.map((s, i) => {
-      const startAttr = `data-start="${round(t)}" data-duration="${s.dur}" data-media-start="${round(s.src_in - mediaOffset)}"`;
+      const startAttr = `data-start="${exact2(t)}" data-duration="${s.dur}" data-media-start="${exact2(s.src_in - mediaOffset)}"`;
       t += s.dur;
       return `      <video id="${clip.id}-v${i}" src="${source}" ${startAttr} data-track-index="0" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>`;
     }).join('\n') + `\n${audio}`;

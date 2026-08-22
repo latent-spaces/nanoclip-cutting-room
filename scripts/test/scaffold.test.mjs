@@ -189,18 +189,29 @@ test('CLI extract: a segment edge one frame off a LOCAL cut snaps onto it (stray
   assert.match(res.stderr, /c1: segment 0 out 2\.03 → 2 \(local cut\)/);
 });
 
-test('snapSegmentsToCuts: a cut off the 2dp grid rounds INTO the scene on both edges', () => {
-  // cut frame 46 at start 0.5 → 2.0333…: the out-point floors (2.03 → ceil(1.53×30)=46
-  // frames, last sampled frame 45 = before the cut), the in-point ceils (2.04 → the
-  // player's floor(1.54×30)=46 = the cut frame itself, never 45)
+test('snapSegmentsToCuts: the snapped edge is the exact grid double, never rounded to 2dp', () => {
+  // cut frame 46 at start 0.5 → 2.0333…: kept as the exact double (float law). Frame
+  // math downstream is Math.round (reframe proxyIn / segFrames) and ceil−ε (render),
+  // both of which land on 46 — a 2dp rounding (2.03) would not.
+  const cutTime = 0.5 + 46 / 30;
   const [a, b] = snapSegmentsToCuts([
     { src_in: 0.5, src_out: 2.07 },   // one frame past frame 46 (2.0667 → frame 47)
     { src_in: 2.0, src_out: 3 },      // one frame before frame 46 (2.0 → frame 45)
   ], { start: 0.5, cuts: [46], fps: 30 });
-  assert.equal(a.src_out, 2.03);
+  assert.equal(a.src_out, cutTime);
   assert.equal(Math.ceil((a.src_out - a.src_in) * 30 - 1e-6), 46);
-  assert.equal(b.src_in, 2.04);
-  assert.equal(Math.floor((b.src_in - 0.5) * 30), 46);
+  assert.equal(Math.round((a.src_out - a.src_in) * 30), 46);
+  assert.equal(b.src_in, cutTime);
+  assert.equal(Math.round((b.src_in - 0.5) * 30), 46);
+});
+
+test('scaffoldComposition: a grid-valued segment edge reaches the attributes as the exact double', () => {
+  const srcOut = 47.56 + 1256 / 30; // a snapped out-point: 89.42666…
+  const c = { ...clip(), segments: [{ src_in: 52.56, src_out: srcOut, snapped_out: 'local_cut' }] };
+  const html = scaffoldComposition(c, { source: 'assets/clip30.mp4', mediaOffset: 47.56 });
+  const dur = String(srcOut - 52.56);
+  assert.match(html, new RegExp(`id="c1-a0"[^>]*data-duration="${dur.replace('.', '\\.')}"`), 'no 2dp strip on a grid value');
+  assert.ok(!html.includes('data-duration="36.87"'), 'rounding to nearest would re-admit the stray frame');
 });
 
 test('CLI extract: a covered re-run still snaps a moved edge onto the known local cut', () => {
