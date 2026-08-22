@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  CUE_GAP_S, CUE_HOLD_S, CUE_MAX_WORDS, DEFAULT_CAPTION_STYLE,
+  CUE_GAP_S, CUE_HOLD_S, CUE_MAX_WORDS, CUE_MIN_WORD_S, DEFAULT_CAPTION_STYLE,
   deriveCues, resolveStyle,
 } from '../captions.mjs';
 
@@ -80,6 +80,35 @@ test('deriveCues: a cue holds after its last word but yields to the next cue and
   assert.equal(cues[0].end, 1.4 + CUE_HOLD_S);
   assert.equal(cues[1].end, 3.25);
   assert.equal(cues[2].end, 10);
+});
+
+test('deriveCues: a cue never ends before its last word — the yield only eats into the hold', () => {
+  const c = clip([{ src_in: 0, src_out: 10 }]);
+  const words = [
+    w('one', 1.0, 1.2), w('two', 1.2, 1.4), w('three', 1.4, 1.6), w('four', 1.6, 2.0),
+    w('five', 2.0, 2.3), // word cap: next cue starts exactly on 'four'.end
+  ];
+  const cues = deriveCues(c, words);
+  assert.equal(cues.length, 2);
+  assert.equal(cues[0].end, 2.0, 'ends ON the last word, not 50ms before it');
+  assert.equal(cues[1].start, 2.0);
+});
+
+test('deriveCues: a zero-length word gets a minimum highlight window', () => {
+  const c = clip([{ src_in: 0, src_out: 10 }]);
+  const words = [w('it.', 4.64, 4.64), w('Next', 6.0, 6.3)]; // >0.8s gap: a fresh cue
+  const cues = deriveCues(c, words);
+  const it = cues[0].words[0];
+  assert.equal(it.start, 4.64);
+  assert.equal(it.end, 4.64 + CUE_MIN_WORD_S);
+  assert.equal(cues[0].end, 4.64 + CUE_MIN_WORD_S + CUE_HOLD_S);
+});
+
+test('deriveCues: the minimum window never crosses the segment end', () => {
+  const c = clip([{ src_in: 0, src_out: 5 }]);
+  const cues = deriveCues(c, [w('end', 4.98, 4.98)]);
+  assert.equal(cues[0].words[0].end, 5);
+  assert.equal(cues[0].end, 5);
 });
 
 test('deriveCues: Hebrew cues carry rtl, Latin cues do not', () => {
