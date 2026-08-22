@@ -214,29 +214,35 @@ export function buildDigest(transcript, vision, { duration_s } = {}) {
   };
 }
 
-// Clip boundaries, editorial.md §3 made deterministic: enter/exit on the picked
-// words; snap to a scene cut when one sits within 1.5s AND inside the word gap
-// (never mid-word by construction); otherwise a small pad inside the gap.
-export function snapClip(words, sceneCuts, a, b) {
+// Clip boundaries, editorial.md §3 made deterministic. Editorial owns the WORDS:
+// enter on the hook, exit on the payoff, a small pad inside the word gap. It also
+// emits cut_window — the legal range for each edge (inside the word gap, within
+// CUT_REACH_S of the picked word). Picture cuts are decided later, by
+// scaffold.mjs extract, on the proxy's own 30fps cut list (rules 3 and 6);
+// NanoClip's scene times are never an edge.
+export const CUT_REACH_S = 1.5;   // how far an edge may travel from its word to meet a cut
+export const PAD_IN_S = 0.2;      // pre-roll before the hook when no cut is taken
+export const PAD_OUT_S = 0.25;    // tail after the payoff when no cut is taken
+export function snapClip(words, a, b) {
   const first = words[a];
   const last = words[b - 1];
   const prevEnd = a > 0 ? words[a - 1].end : 0;
   const nextStart = b < words.length ? words[b].start : Infinity;
-  const cutIn = sceneCuts
-    .filter((t) => t >= Math.max(prevEnd, first.start - 1.5) && t <= first.start).at(-1);
-  const cutOut = sceneCuts
-    .find((t) => t >= last.end && t <= Math.min(nextStart, last.end + 1.5));
-  const padIn = Math.min(0.2, a > 0 ? (first.start - prevEnd) / 2 : first.start);
-  const padOut = nextStart === Infinity ? 0.25 : Math.min(0.25, (nextStart - last.end) / 2);
+  const padIn = Math.min(PAD_IN_S, a > 0 ? (first.start - prevEnd) / 2 : first.start);
+  const padOut = nextStart === Infinity ? PAD_OUT_S : Math.min(PAD_OUT_S, (nextStart - last.end) / 2);
   return {
     word_start_idx: a,
     word_end_idx: b,
     start: round(first.start),
     end: round(last.end),
-    src_in: round(cutIn ?? Math.max(0, first.start - padIn)),
-    src_out: round(cutOut ?? last.end + padOut),
-    snapped_in: cutIn !== undefined ? 'scene_cut' : 'word_gap',
-    snapped_out: cutOut !== undefined ? 'scene_cut' : 'word_gap',
+    src_in: round(Math.max(0, first.start - padIn)),
+    src_out: round(last.end + padOut),
+    snapped_in: 'word_gap',
+    snapped_out: 'word_gap',
+    cut_window: {
+      in: [round(Math.max(prevEnd, first.start - CUT_REACH_S)), round(first.start)],
+      out: [round(last.end), round(nextStart === Infinity ? last.end + CUT_REACH_S : Math.min(nextStart, last.end + CUT_REACH_S))],
+    },
   };
 }
 
@@ -403,7 +409,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       + ' | thumbs --dir <rundir> [--source <video>]'
       + ' | gapframes --dir <rundir> [--source <video>] [--min-gap 5] [--per-region 3] [--frames 2] [--width 480]'
       + ' | locate (--dir <rundir> | --transcript <json>) --words <a>..<b>'
-      + ' | clip (--dir <rundir> | --transcript <json> --vision <json>) --words <a>..<b>'
+      + ' | clip (--dir <rundir> | --transcript <json>) --words <a>..<b>'
       + '\n  --words a..b is END-EXCLUSIVE (array slice): words a … b-1. To end ON word 840, pass ..841.');
     process.exit(2);
   };
@@ -536,17 +542,15 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 
   if (cmd === 'clip') {
     const tPath = flag('transcript') ?? (dir && join(dir, 'data', 'transcript.json'));
-    const vPath = flag('vision') ?? (dir && join(dir, 'data', 'vision.json'));
     const m = /^(\d+)\.\.(\d+)$/.exec(flag('words') ?? '');
-    if (!tPath || !vPath || !m) usage();
+    if (!tPath || !m) usage();
     const words = readJson(tPath).words ?? [];
     const [a, b] = [Number(m[1]), Number(m[2])];
     if (!words.slice(a, b).length) {
       console.error(`no words in range ${a}..${b} (transcript has ${words.length})`);
       process.exit(1);
     }
-    const scenes = (readJson(vPath).scenes ?? []).map((s) => s.after_frame?.timestamp ?? 0);
-    const clip = snapClip(words, scenes, a, b);
+    const clip = snapClip(words, a, b);
     clip.text = words.slice(a, b).map((w) => w.text).join(' ');
     console.log(JSON.stringify(clip));
     console.error(`clip words ${a}..${b} → src ${clip.src_in}-${clip.src_out} (in:${clip.snapped_in} out:${clip.snapped_out})`);

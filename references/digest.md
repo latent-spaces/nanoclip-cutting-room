@@ -41,7 +41,9 @@ one-line error, exit 1. Fixture mode for tests/demos: explicit `--transcript/--v
   breaks a turn). Columns per `timeline_columns`: start, end, speaker, word_idx,
   onscreen (clusters visible ≥half the turn), text. Turn text is an exact join of the
   utterance texts (verified round-trip of `words[]` on the recorded payloads).
-- `scene_cuts` — hard-cut timestamps ("use as edit cut points").
+- `scene_cuts` — NanoClip's hard-cut timestamps: a reading signal (energy, visual
+  variety). Never a clip edge — edges come from the proxy's own cut list at extract
+  (editorial.md §3).
 - `density` — words per minute + silence gaps (dead air ≥2s, longest 20).
 - `asd`, `counts`, `notes` — run facts and the encoding legend, self-describing.
 

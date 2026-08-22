@@ -22,20 +22,32 @@ export const EXTRACT_PAD_S = 5;
 const EOF_CLONE_PAD_MAX_S = 2;
 export const STRAY_FRAMES = 1; // a segment edge this many frames off a local cut is a stray frame, not a choice
 
-// NanoClip's scene times and the proxy's own scdet disagree by a frame now and then;
-// a segment edge that lands ONE frame past (out) or before (in) a local cut then
-// carries a stray frame of the neighbouring scene — the dup-free two-runtime player
-// shows it as a flash. Snap such edges onto the local cut; leave exact hits and real
-// overruns (≥ 2 frames) alone. Returns new segment objects, stamps provenance.
+// Where a clip may cut (editorial.md §3). Editorial fixed the words and emitted
+// cut_window — the legal range for each edge (inside the word gap, within reach of
+// the picked word). Here, with the proxy's OWN 30fps cut list in hand, two rules:
+//  3. a picture cut inside the window takes the edge — the first cut after the
+//     payoff, the last cut before the hook (NanoClip's scene times are never an edge);
+//  6. an edge sitting ONE frame off a local cut is a stray frame of the neighbouring
+//     scene (seen as a flash in the dup-free player) — snap it onto the cut.
+// The snapped edge is the cut's exact grid time, never rounded to the plan's 2dp
+// (reframe.md float law (d)). Returns new segment objects, stamps provenance.
 export function snapSegmentsToCuts(segments, { start, cuts, fps }) {
   const toFrame = (t) => Math.round((t - start) * fps);
-  // The snapped edge is the cut's exact grid time — never rounded to the plan's 2dp
-  // (the float law): rounding to nearest is how the stray frame got in.
   const atCut = (f) => start + f / fps;
+  const times = cuts.map(atCut);
   return segments.map((seg) => {
     const out = { ...seg };
-    const fIn = toFrame(seg.src_in);
-    const fOut = toFrame(seg.src_out);
+    const win = seg.cut_window;
+    if (win?.out) {
+      const t = times.find((c) => c >= win.out[0] && c <= win.out[1]);
+      if (t !== undefined) { out.src_out = t; out.snapped_out = 'local_cut'; }
+    }
+    if (win?.in) {
+      const t = times.filter((c) => c >= win.in[0] && c <= win.in[1]).at(-1);
+      if (t !== undefined) { out.src_in = t; out.snapped_in = 'local_cut'; }
+    }
+    const fIn = toFrame(out.src_in);
+    const fOut = toFrame(out.src_out);
     const tail = cuts.find((c) => fOut - c >= 1 && fOut - c <= STRAY_FRAMES);
     if (tail !== undefined) { out.src_out = atCut(tail); out.snapped_out = 'local_cut'; }
     const head = cuts.find((c) => c - fIn >= 1 && c - fIn <= STRAY_FRAMES);

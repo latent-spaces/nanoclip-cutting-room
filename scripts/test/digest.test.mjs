@@ -583,7 +583,7 @@ test('CLI build: dropping back under budget cleans stale shard files', () => {
 
 // ---- clip boundary snapping: editorial.md §3 made deterministic ----
 
-test('snapClip: boundaries snap to scene cuts within 1.5s, never mid-word', () => {
+test('snapClip: edges sit in the word gaps; the cut_window says where a picture cut may move them', () => {
   const words = [
     { text: 'setup', start: 10, end: 10.8 },
     { text: 'hook', start: 12, end: 12.4 },   // clip starts here
@@ -591,54 +591,56 @@ test('snapClip: boundaries snap to scene cuts within 1.5s, never mid-word', () =
     { text: 'payoff', start: 13.2, end: 14 },  // clip ends here
     { text: 'trail', start: 15.5, end: 16 },
   ];
-  // cut at 11.2 sits in the word gap, 0.8s before the hook → snap in
-  // cut at 14.6 sits before the next word, 0.6s after the payoff → snap out
-  const scenes = [11.2, 14.6];
-  const c = snapClip(words, scenes, 1, 4);
+  const c = snapClip(words, 1, 4);
   assert.equal(c.start, 12);
   assert.equal(c.end, 14);
-  assert.equal(c.src_in, 11.2);
-  assert.equal(c.src_out, 14.6);
-  assert.deepEqual([c.snapped_in, c.snapped_out], ['scene_cut', 'scene_cut']);
+  assert.equal(c.src_in, 11.8);   // 0.2 pre-roll inside the 1.2s gap
+  assert.equal(c.src_out, 14.25); // 0.25 tail inside the 1.5s gap
+  assert.deepEqual([c.snapped_in, c.snapped_out], ['word_gap', 'word_gap']);
+  // in: never before the setup word ends, never more than 1.5s before the hook
+  assert.deepEqual(c.cut_window.in, [10.8, 12]);
+  // out: never past the next word, never more than 1.5s after the payoff
+  assert.deepEqual(c.cut_window.out, [14, 15.5]);
 });
 
-test('snapClip: a cut that would swallow the previous word is refused', () => {
+test('snapClip: the cut_window never reaches into a neighbouring word', () => {
   const words = [
     { text: 'setup', start: 10, end: 11.5 },
     { text: 'hook', start: 12, end: 12.4 },
     { text: 'payoff', start: 12.5, end: 13 },
+    { text: 'next', start: 13.1, end: 13.6 },
   ];
-  // 11.4 is mid-setup-word; 10.9 is too far (>1.5s) — neither is legal
-  const c = snapClip(words, [10.9, 11.4], 1, 3);
-  assert.equal(c.snapped_in, 'word_gap');
-  // fallback: a small pre-roll inside the word gap, never touching the setup word
+  const c = snapClip(words, 1, 3);
+  assert.deepEqual(c.cut_window.in, [11.5, 12]);  // the 1.5s reach is clipped by the setup word
+  assert.deepEqual(c.cut_window.out, [13, 13.1]); // and by the next word
   assert.ok(c.src_in > 11.5 && c.src_in < 12);
+  assert.ok(c.src_out > 13 && c.src_out <= 13.05);
 });
 
-test('snapClip: without cuts, boundaries get a small pad inside the word gaps', () => {
+test('snapClip: at the clip edges of the transcript the window runs the full reach', () => {
   const words = [
     { text: 'hook', start: 5, end: 5.5 },
     { text: 'payoff', start: 5.6, end: 6.2 },
-    { text: 'next', start: 6.3, end: 7 },
   ];
-  const c = snapClip(words, [], 0, 2);
-  assert.equal(c.src_in, Math.max(0, 5 - 0.2));
-  assert.ok(c.src_out > 6.2 && c.src_out <= 6.3);
-  assert.deepEqual([c.snapped_in, c.snapped_out], ['word_gap', 'word_gap']);
+  const c = snapClip(words, 0, 2);
+  assert.equal(c.src_in, 4.8);
+  assert.equal(c.src_out, 6.45);
+  assert.deepEqual(c.cut_window.in, [3.5, 5]);
+  assert.deepEqual(c.cut_window.out, [6.2, 7.7]);
 });
 
 test('CLI clip: resolves and snaps a word range against the recorded payloads', () => {
   const res = spawnSync('node', [
     DIGEST_CLI, 'clip',
     '--transcript', join(FIXTURES, 'transcript_v2.json'),
-    '--vision', join(FIXTURES, 'vision_v2.json'),
     '--words', '121..130',
   ], { encoding: 'utf8' });
   assert.equal(res.status, 0);
   const c = JSON.parse(res.stdout);
   assert.equal(c.text, 'I got a DM from a haunted vending machine.');
   assert.ok(c.src_in <= c.start && c.end <= c.src_out);
-  assert.ok(['scene_cut', 'word_gap'].includes(c.snapped_in));
+  assert.deepEqual([c.snapped_in, c.snapped_out], ['word_gap', 'word_gap']);
+  assert.ok(c.cut_window.in[0] <= c.src_in && c.src_out <= c.cut_window.out[1]);
 });
 
 // ---- visual gap enrichment: bounded frame extraction for scouts ----

@@ -26,8 +26,9 @@ below. THIS DOCUMENT IS NOW LAW.
    default 30). Any mapping between the two timebases lands a cut mid-frame somewhere —
    an off-by-one frame that shows as a visible glitch at the switch — one frame too
    early on one side of the cut, one frame too late on the other. So:
-   - Segment edges are then reconciled with the PROXY's cuts, not NanoClip's: an edge
-     one frame off a local cut is a stray frame, and `extract` snaps it (compose.md).
+   - Segment edges are decided on the PROXY's cuts, not NanoClip's: a cut inside the
+     editorial `cut_window` takes the edge; an edge one frame off a local cut is a stray
+     frame and `extract` snaps it (compose.md).
    - Transcode ONCE per input to a 30fps-exact local working copy (wall-clock times
      preserved — word/face timestamps stay valid; reuse the intake stage's mezzanine
      transcode machinery).
@@ -35,9 +36,11 @@ below. THIS DOCUMENT IS NOW LAW.
      grid. The battle-tested reference pipeline below covers this step (use it, do not
      reinvent thresholds).
    - Author reframe switches at exact k/30 times from THAT list; render `--fps 30`.
-   - **Two cut lists, two jobs:** NanoClip's `scenes[]` stays the editorial signal in the
-     digest (clip snapping, energy). The locally re-detected 30fps list is the ONLY
-     authority for reframe switch times and render-side frame math. Never mix them.
+   - **Two cut lists, two jobs:** NanoClip's `scenes[]` is a READING signal in the digest
+     (energy, visual variety for scoring). The locally re-detected 30fps list is the ONLY
+     authority for every edge on the picture — clip in/out points (editorial.md §3 rule 3,
+     applied by `extract` inside the segment's `cut_window`), reframe switch times and
+     render-side frame math. Never mix them.
 
 3. **SPLIT-SCREEN IS A REQUIREMENT (locked product decision) — and the chosen mechanism gives
    it free.** Verified by a second spike (scripts/split-spike.mjs, check 0 findings,

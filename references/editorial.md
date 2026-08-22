@@ -43,7 +43,7 @@ timeline never enters one context.
 - **One judge head.** Collects all scout JSON (a few KB), applies §6 globally — diversity,
   spread across the runtime, ties to the stronger hook — picks the batch, then resolves
   each pick deterministically: `node scripts/digest.mjs clip --dir <rundir> --words a..b`
-  → `src_in/src_out` (snapped per §3). `a..b` is end-exclusive: b = the index AFTER the
+  → `src_in/src_out` + `cut_window` (§3 — copy the whole segment as returned). `a..b` is end-exclusive: b = the index AFTER the
   last word you want. Read back the returned `text` — its last word must be the punchline. Reads the scouts' `gap_notes` alongside candidates —
   a visual moment can boost or seed a candidate (a physical bit is clip material; a title
   card warns "don't cut into this") — and merges all notes into the pool file as a top-level
@@ -89,20 +89,41 @@ Not scored low — dropped.
 - **Ad reads, merch plugs, housekeeping.** The classic trap: an episode that opens on the
   merch plug (first ~20s, "Go to our merch store…") — high energy, zero clip value.
 - Unresolved antecedent (§1.2).
-- Boundary mid-word or mid-sentence (plan contract; should never survive snapping).
+- Boundary mid-word or mid-sentence (plan contract; rule 1 of §3 makes it impossible).
 - Under ~12s (no arc fits) or over ~90s (not a short).
 - The joke is the show's inside lore.
 
-## 3. Boundaries — mechanical rules
+## 3. Boundaries — where a clip may cut (the six rules)
 
-- **Snap:** always to an utterance boundary; when a scene cut (`vision.scenes[]`, documented
-  "use as edit cut points") sits within ~1.5s of it, snap to the cut.
+Editorial owns the WORDS; the picture cut is decided later on the proxy. The rules:
+
+1. **Never inside a word.** An edge lives in a word gap: the in-point between the
+   previous word's end and the hook's first word, the out-point between the payoff's
+   last word and the next word.
+2. **Never more than 1.5s from the picked word** (`CUT_REACH_S`). Past that, a cut is a
+   different edit, not a cleaner one.
+3. **A picture cut inside that window takes the edge.** "Picture cut" = the PROXY's own
+   30fps cut list (`composition.extract.cuts`), applied by `scaffold.mjs extract`: the
+   first cut after the payoff, the last cut before the hook. NanoClip's `scene_cuts` are
+   a reading signal (energy, variety) — **never an edge**: they sit on the source's
+   29.97 grid and land a frame off the proxy's cut, which shows as a one-frame flash.
+4. **Otherwise a small pad inside the gap:** ≤0.2s before the hook, ≤0.25s after the
+   payoff, never more than half the gap.
+5. **Segment seams obey the same rules on both sides** (multi-segment = excising a dead
+   digression ≥8s; max 2 segments in v1).
+6. **One frame off a local cut is a stray frame, not a choice** — `extract` snaps it
+   (hand edits, older plans).
+
+`node scripts/digest.mjs clip --words a..b` implements 1, 2 and 4: it returns
+`src_in/src_out` (word-gap edges, `snapped_*: "word_gap"`) plus `cut_window`
+`{ in: [lo, hi], out: [lo, hi] }` — the legal range for each edge. **Copy the segment
+as returned** (`src_in`, `src_out`, `snapped_in/out`, `cut_window`) into
+`plan.clips[].segments`; extract then applies 3 and 6 and restamps `local_cut`. A
+segment without `cut_window` only gets rule 6.
+
 - **Enter:** on the hook utterance. One earlier setup utterance is allowed only when the
   antecedent rule demands it.
-- **Exit:** end of the payoff utterance, plus at most one reaction beat (~2s), scene cut
-  preferred on the way out.
-- **Multi-segment:** use to excise a dead digression (≥8s that serves no beat of the arc).
-  Max 2 segments in v1; joins land on scene cuts or clean utterance gaps so the seam is invisible.
+- **Exit:** end of the payoff utterance, plus at most one reaction beat (~2s).
 
 ## 4. Length
 

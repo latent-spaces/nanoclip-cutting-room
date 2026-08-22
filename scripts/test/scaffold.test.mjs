@@ -214,6 +214,32 @@ test('scaffoldComposition: a grid-valued segment edge reaches the attributes as 
   assert.ok(!html.includes('data-duration="36.87"'), 'rounding to nearest would re-admit the stray frame');
 });
 
+test('CLI extract: a local cut inside the cut_window takes the edge (rule 3)', () => {
+  // editorial left word-gap edges + the legal windows; the proxy's cut at 2.0 is in reach
+  const rundir = seedExtractRundir('cr-ex-win-', [
+    { src_in: 1, src_out: 1.85, snapped_out: 'word_gap', cut_window: { in: [0.5, 1.2], out: [1.6, 2.4] } },
+    { src_in: 2.3, src_out: 3, snapped_in: 'word_gap', cut_window: { in: [1.7, 2.5], out: [3, 3.5] } },
+  ]);
+  const res = spawnSync('node', [SCAFFOLD_CLI, 'extract', '--dir', rundir, '--pad', '0.5'], { encoding: 'utf8' });
+  assert.equal(res.status, 0, res.stderr);
+  const segs = JSON.parse(readFileSync(join(rundir, 'plan.json'), 'utf8')).clips[0].segments;
+  assert.equal(segs[0].src_out, 2, 'payoff side: the first cut after the payoff');
+  assert.equal(segs[0].snapped_out, 'local_cut');
+  assert.equal(segs[0].src_in, 1, 'no cut in the in-window: the word-gap edge stands');
+  assert.equal(segs[1].src_in, 2, 'hook side: the last cut before the hook');
+  assert.equal(segs[1].snapped_in, 'local_cut');
+  assert.equal(segs[1].src_out, 3);
+  assert.match(res.stderr, /c1: segment 0 out 1\.85 → 2 \(local cut\)/);
+});
+
+test('snapSegmentsToCuts: a cut outside the cut_window never moves an edge (rules 1–2)', () => {
+  const [seg] = snapSegmentsToCuts([
+    { src_in: 1, src_out: 1.85, cut_window: { in: [0.5, 1.2], out: [1.6, 1.9] } }, // cut 2.0 is past the next word
+  ], { start: 0.5, cuts: [45], fps: 30 });
+  assert.equal(seg.src_out, 1.85);
+  assert.equal(seg.snapped_out, undefined);
+});
+
 test('CLI extract: a covered re-run still snaps a moved edge onto the known local cut', () => {
   const rundir = seedExtractRundir('cr-ex-snap2-', [{ src_in: 1, src_out: 3 }]);
   assert.equal(spawnSync('node', [SCAFFOLD_CLI, 'extract', '--dir', rundir, '--pad', '0.5'], { encoding: 'utf8' }).status, 0);
