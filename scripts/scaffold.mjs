@@ -107,9 +107,11 @@ const CAPTION_CSS = `      .captions { position: absolute; inset: 0; z-index: 20
 const captionMarkup = (clip) => {
   const cues = clip.captions.cues.map((cue, k) => {
     const dir = cue.rtl ? ' dir="rtl"' : '';
+    // one line per cue (the cue is a flex row, so inter-span whitespace is inert):
+    // a word per line tripped lint's composition_file_too_large on every clip.
     const words = cue.words.map((w, j) =>
-      `        <span class="cap-word" id="${clip.id}-cue${k}w${j}">${escapeHtml(w.text)}</span>`).join('\n');
-    return `      <div id="${clip.id}-cue${k}" class="cap-cue"${dir}>\n${words}\n      </div>`;
+      `<span class="cap-word" id="${clip.id}-cue${k}w${j}">${escapeHtml(w.text)}</span>`).join(' ');
+    return `      <div id="${clip.id}-cue${k}" class="cap-cue"${dir}>${words}</div>`;
   }).join('\n');
   return `      <div id="${clip.id}-captions" class="captions" data-caption-style="${escapeHtml(clip.captions.style ?? '')}" aria-hidden="true">\n${cues}\n      </div>`;
 };
@@ -333,6 +335,15 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   for (const clip of workClips) {
     const projectDir = join(dir, 'compose', clip.id);
     mkdirSync(join(projectDir, 'assets'), { recursive: true });
+    // A rebuild replaces whatever styling landed in index.html since the last
+    // build (a Composer's, or a hand edit with the status still 'scaffolded'):
+    // keep the previous file whenever one exists and say so (iterate.md §1).
+    const prior = join(projectDir, 'index.html');
+    if (existsSync(prior)) {
+      copyFileSync(prior, prior + '.prev');
+      const composed = clip.composition?.status && clip.composition.status !== 'scaffolded';
+      console.error(`${clip.id}: rebuilding — previous index.html kept as index.html.prev${composed ? '; re-run the Composer pass' : ''}`);
+    }
     const extract = clip.composition?.extract;
     const proxy = extract && join(projectDir, extract.file);
     const link = join(projectDir, 'assets', 'source.mp4');

@@ -86,6 +86,26 @@ test('CLI: check gates the render, output is probed, plan is stamped', () => {
   assert.equal(plan.clips[2].render.status, 'none', 'unscaffolded clip not stamped');
 });
 
+test('CLI: a composition stamped by a Composer (any status but none) still renders; skips are said', () => {
+  const rundir = seedRundir('cr-render-stamp-');
+  const planPath = join(rundir, 'plan.json');
+  const plan = JSON.parse(readFileSync(planPath, 'utf8'));
+  plan.clips[0].composition.status = 'composed';
+  writeFileSync(planPath, JSON.stringify(plan));
+  const res = runCli(rundir, []);
+  assert.equal(res.status, 0, res.stderr);
+  assert.deepEqual(Object.keys(JSON.parse(res.stdout).rendered), ['c1']);
+  assert.match(res.stderr, /c2: skipped — status rejected/);
+  assert.match(res.stderr, /c3: skipped — no composition/);
+});
+
+test('CLI: nothing to render is an error, not a silent exit 0', () => {
+  const rundir = seedRundir('cr-render-empty-');
+  const res = runCli(rundir, ['--clip', 'c3']);
+  assert.equal(res.status, 1);
+  assert.match(res.stderr, /nothing rendered/);
+});
+
 test('CLI: --quality high renders the delivery name, --clip filters', () => {
   const rundir = seedRundir('cr-render-hi-');
   const res = runCli(rundir, ['--quality', 'high', '--clip', 'c1']);

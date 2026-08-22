@@ -403,7 +403,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       + ' | thumbs --dir <rundir> [--source <video>]'
       + ' | gapframes --dir <rundir> [--source <video>] [--min-gap 5] [--per-region 3] [--frames 2] [--width 480]'
       + ' | locate (--dir <rundir> | --transcript <json>) --words <a>..<b>'
-      + ' | clip (--dir <rundir> | --transcript <json> --vision <json>) --words <a>..<b>');
+      + ' | clip (--dir <rundir> | --transcript <json> --vision <json>) --words <a>..<b>'
+      + '\n  --words a..b is END-EXCLUSIVE (array slice): words a … b-1. To end ON word 840, pass ..841.');
     process.exit(2);
   };
   const [cmd] = argv;

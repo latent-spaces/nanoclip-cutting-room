@@ -40,9 +40,17 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const rendered = {};
   for (const clip of plan.clips ?? []) {
     if (only && clip.id !== only) continue;
-    if (!['proposed', 'approved'].includes(clip.status)) continue;
-    if (clip.composition?.status !== 'scaffolded') continue;
+    if (!['proposed', 'approved'].includes(clip.status)) {
+      console.error(`${clip.id}: skipped — status ${clip.status}`);
+      continue;
+    }
+    // Any stamped composition renders ('scaffolded', or whatever a Composer wrote
+    // after restyling) — only a clip with no composition project is skipped, aloud.
     const projectDir = join(dir, 'compose', clip.id);
+    if (!clip.composition?.status || clip.composition.status === 'none') {
+      console.error(`${clip.id}: skipped — no composition (scaffold it first)`);
+      continue;
+    }
 
     // the gate: check must pass before any render (compose.md §4)
     const check = spawnSync('npx', [HYPERFRAMES_PKG, 'check'], { cwd: projectDir, encoding: 'utf8' });
@@ -92,6 +100,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     };
     rendered[clip.id] = { path: clip.render.path, frames: wantFrames, bytes: clip.render.bytes };
     console.error(`${clip.id}: rendered ${out} (${wantFrames} frames, ${(clip.render.bytes / 1e6).toFixed(1)}MB)`);
+  }
+  if (Object.keys(rendered).length === 0) {
+    console.error('nothing rendered — no proposed/approved clip with a composition matched');
+    process.exit(1);
   }
   writeFileSync(planPath + '.tmp', JSON.stringify(plan, null, 2) + '\n');
   renameSync(planPath + '.tmp', planPath);

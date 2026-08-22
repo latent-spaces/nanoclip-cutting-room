@@ -13,7 +13,9 @@ This document is the judgment; the scaffolder enforces the mechanics.
 ## 0b. Running the pass — one context or many
 
 `data/digest.json` decides the shape. **It has `timeline`** (short footage): read it whole,
-apply §1–§6, write `plan.clips`. **It has `shards`** (long footage): map-reduce — the full
+apply §1–§6, write `plan.clips` — AND `data/candidates.json` with everything you
+considered (the pool below is the iteration contract on short footage too; "swap c2"
+must never re-read the timeline). **It has `shards`** (long footage): map-reduce — the full
 timeline never enters one context.
 
 - **Scouts, one agent per shard, parallel.** Each scout reads the index (cast + notes) and
@@ -41,7 +43,8 @@ timeline never enters one context.
 - **One judge head.** Collects all scout JSON (a few KB), applies §6 globally — diversity,
   spread across the runtime, ties to the stronger hook — picks the batch, then resolves
   each pick deterministically: `node scripts/digest.mjs clip --dir <rundir> --words a..b`
-  → `src_in/src_out` (snapped per §3). Reads the scouts' `gap_notes` alongside candidates —
+  → `src_in/src_out` (snapped per §3). `a..b` is end-exclusive: b = the index AFTER the
+  last word you want. Read back the returned `text` — its last word must be the punchline. Reads the scouts' `gap_notes` alongside candidates —
   a visual moment can boost or seed a candidate (a physical bit is clip material; a title
   card warns "don't cut into this") — and merges all notes into the pool file as a top-level
   `gap_notes: [{ seg, t, note }]` (additive to candidates@1). Writes `plan.clips`

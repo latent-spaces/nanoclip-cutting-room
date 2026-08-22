@@ -95,6 +95,32 @@ test('CLI build --dir: re-run is idempotent and refreshes the composition', () =
   assert.ok(existsSync(join(rundir, 'compose', 'c1', 'assets', 'source.mp4')));
 });
 
+test('CLI build --dir: rebuilding a Composer-styled clip keeps index.html.prev and says so', () => {
+  const workdir = mkdtempSync(join(tmpdir(), 'cr-scaffold-prev-'));
+  const rundir = join(workdir, 'cutting-room');
+  mkdirSync(rundir, { recursive: true });
+  writeFileSync(join(workdir, 'clip.mp4'), 'x');
+  const planPath = join(rundir, 'plan.json');
+  writeFileSync(planPath, JSON.stringify({
+    schema: 'cutting-room/plan@2',
+    source: { path: 'clip.mp4', duration_s: 600, project_id: 'p' },
+    clips: [{ id: 'c1', title: 'One', hook: '"h"', status: 'proposed', segments: [{ src_in: 1, src_out: 2 }], composition: { status: 'none', path: null } }],
+  }));
+  assert.equal(spawnSync('node', [SCAFFOLD_CLI, 'build', '--dir', rundir], { encoding: 'utf8' }).status, 0);
+  // a Composer restyles and stamps the composition
+  const html = join(rundir, 'compose', 'c1', 'index.html');
+  writeFileSync(html, '<!-- composer styling -->');
+  const plan = JSON.parse(readFileSync(planPath, 'utf8'));
+  plan.clips[0].composition.status = 'composed';
+  writeFileSync(planPath, JSON.stringify(plan));
+  const r2 = spawnSync('node', [SCAFFOLD_CLI, 'build', '--dir', rundir], { encoding: 'utf8' });
+  assert.equal(r2.status, 0, r2.stderr);
+  assert.match(r2.stderr, /c1: rebuilding.*index\.html\.prev; re-run the Composer pass/);
+  assert.equal(readFileSync(html + '.prev', 'utf8'), '<!-- composer styling -->');
+  assert.doesNotMatch(readFileSync(html, 'utf8'), /composer styling/);
+  assert.equal(JSON.parse(readFileSync(planPath, 'utf8')).clips[0].composition.status, 'scaffolded');
+});
+
 // ---- per-clip extract (reframe.md law #2): lock each clip window
 // to a 30fps CFR proxy, then find cuts on the file just made — never on the source ----
 

@@ -8,7 +8,7 @@ the right file via the OWNING tool → refresh/re-render → the user looks agai
 
 | The user says | Owning tool | Path |
 |---|---|---|
-| "start c2 two seconds earlier" / boundary moves | main thread | edit `plan.clips[].segments` (word-anchored via `digest.mjs locate`/`clip`) → `scaffold.mjs extract` (re-extracts only if the window escaped the pad) → `reframe.mjs shots` → `captions.mjs cues` → `scaffold.mjs build` → refresh |
+| "start c2 two seconds earlier" / boundary moves | main thread | edit `plan.clips[].segments` (word-anchored via `digest.mjs locate`/`clip`) → `scaffold.mjs extract` (re-extracts only if the window escaped the pad) → `reframe.mjs shots` → `captions.mjs cues` → `scaffold.mjs build` → refresh. `build` REWRITES `index.html` — a Composer-styled clip loses its look (every rebuild keeps the old file as `index.html.prev`; a composed clip's status flips back to `scaffolded`): re-run the Composer pass on that clip (SendMessage if its Composer is alive) before showing it again |
 | "different clip instead of c3" / new clips | main thread | pool first (editorial.md §0b): promote from `data/candidates.json` or re-run scouts; then the same chain as above |
 | look/motion/caption styling on one clip | that clip's Composer if still alive (SendMessage — context loaded), else main thread | edit `compose/<id>/index.html` per compose-short.md laws → `lint` → refresh |
 | "the transcript says X, it's Y" | main thread | record in `plan.transcript_edits` (additive: `{t, from, to}`), re-run `captions.mjs cues` on affected clips → `scaffold.mjs build` |

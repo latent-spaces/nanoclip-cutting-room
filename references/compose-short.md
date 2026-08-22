@@ -47,8 +47,12 @@ One standalone 9:16 composition, `index.html` at the project root:
    seek hides it). Never overlap two tweens on the same property of the same target —
    clamp a rise so it ends before its revert starts (see the caption mounts for the
    pattern). Verify overlay motion on RENDERED frames, never only on snapshots.
-3. Fonts: a `<link>` to Google Fonts css2 is the sanctioned pattern (registry
-   components ship it). Always keep a system fallback stack.
+3. Fonts: declare the family by name and let the renderer resolve it — it maps
+   Google Fonts families during compile/render (the scaffold's `"Montserrat"` stack
+   is the model). Do NOT add a `<link>`/`@import` to fonts.googleapis.com: lint flags it
+   (`google_fonts_import`) and the raw request can fail before canonicalization. A
+   registry component that ships its own link is exempt from the lint. Custom
+   files: `@font-face { src: url('…woff2') }`. Always keep a system fallback stack.
 4. Allowlist for animation: transform / opacity / color / background-color / filter /
    clip-path on NON-media elements. Nothing else, nothing on media.
 5. **Two runtimes.** The renderer samples t = k/30 and waits for media; the live
@@ -117,9 +121,10 @@ instead (faces clear on both sides); verify on rendered frames, not snapshots.
 
 ## Boundaries (hard)
 
-- You own: `compose/<id>/index.html` (+ files you install under `compose/<id>/`), and
-  `plan.clips[<yours>].composition` ONLY (e.g. stamping status). Nothing else in
-  plan.json — not segments, not reframe, not captions data, not other clips.
+- You own: `compose/<id>/index.html` (+ files you install under `compose/<id>/`).
+  **Never write `plan.json`** — Composers run in parallel and a read-modify-write
+  races the others (observed: stamps lost). Your status goes in your report; the
+  main thread stamps `plan.clips[<yours>].composition.status = "composed"` on PASS.
 - Boundary/timing changes (clip in/out, cue times, shot framing) are NOT yours:
   report the need back; the main thread re-runs the owning script.
 - Do not start players/servers; do not touch other clips' dirs; do not upgrade or

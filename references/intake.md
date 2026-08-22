@@ -64,6 +64,10 @@ Transcription won't guess. Card — question **"What language is spoken in it?"*
 
 - The description IS the tag passed to `--language` at dispatch (for "Another language",
   the user's free-text answer is the tag).
+- Prefs are per machine (`~/.config/cutting-room/prefs.json`). A user asking for a
+  "fresh" / "clean" run, or a second person on the same machine: export
+  `CUTTING_ROOM_PREFS=<rundir>/prefs.json` for the whole session (every script reads it)
+  and say so in chat — never delete the global file.
 - `node scripts/prefs.mjs get` → if `language` is set, reorder so that language is first
   and disclose in one line: `Language pre-selected from your last run (Hebrew) — pick
   another to change it.`

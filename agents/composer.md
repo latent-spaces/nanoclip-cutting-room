@@ -22,7 +22,8 @@ and follow it exactly; do not load hyperframes-* skills or any other HF docs.
 
 The Kit (style.json): caption style = <caption_block or "none picked — default">,
 palette transitions = <list or none>, palette blocks = <list or none>.
-plan.json: <rundir>/plan.json — you own clips[<i>].composition ONLY.
+plan.json: <rundir>/plan.json — READ ONLY for you (Composers run in parallel; the
+main thread stamps clips[<i>].composition.status from your report).
 
 Do:
 1. Restyle the caption block toward <style target> (or refine the default look).
@@ -34,6 +35,11 @@ Do:
 Never touch: media/audio elements or their attributes, cue/word data, other plan
 fields, other clips. Boundary needs go in your report instead.
 ```
+
+**After each Composer reports PASS (main thread):** stamp
+`plan.clips[i].composition.status = "composed"` yourself — one writer, no race.
+`render.mjs` renders any stamped composition; `scaffold.mjs build` on a composed clip
+keeps `index.html.prev` and flips the status back (restyle debt, iterate.md §1).
 
 **Steering:** while a clip's Composer is alive, route "change c2's
 hook/look" edits to it via SendMessage (context loaded); after it exits, the main

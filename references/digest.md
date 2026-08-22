@@ -65,7 +65,9 @@ touching the payload in chat:
 node scripts/digest.mjs locate --dir <rundir> --words 812..840
 ```
 
-→ `{ word_start_idx, word_end_idx, start, end, text }`. This is how picked hooks and
+→ `{ word_start_idx, word_end_idx, start, end, text }`. **`a..b` is end-exclusive** (an
+array slice: words a through b−1) — to end ON word 840 pass `812..841`; check the
+returned `text` ends with the word you meant, or the punchline gets clipped. This is how picked hooks and
 `transcript_edits` word indices become `plan.clips[].segments` numbers at compose time.
 
 ## 3 · Cast thumbnails (feeds the screen's CAST strip — a locked part of the design)
