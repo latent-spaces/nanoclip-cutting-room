@@ -711,13 +711,18 @@ function renderCatalog() {
     const row = el('div', 'palette-row');
     for (const name of names) {
       const item = byName.get(name);
-      const chip = el('button', 'palette-chip with-motif');
-      chip.type = 'button';
-      chip.append(makeMotifPreview(item, family, motifIdx++, 'mini'));
-      chip.append(el('span', null, item.title));
-      chip.classList.toggle('selected', isSelected(family, name));
-      chip.addEventListener('click', () => toggle(family, name, chip));
-      row.append(chip);
+      const tile = el('button', 'palette-tile');
+      tile.type = 'button';
+      tile.append(makeMotifPreview(item, family, motifIdx++, 'stage'));
+      tile.append(el('span', 'tile-name', item.title));
+      if (isSelected(family, name)) {
+        tile.classList.add('selected');
+        const check = el('span', 'tile-check');
+        check.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>';
+        tile.append(check);
+      }
+      tile.addEventListener('click', () => toggle(family, name, tile));
+      row.append(tile);
     }
     group.append(row);
     palette.append(group);

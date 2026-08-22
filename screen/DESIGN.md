@@ -74,12 +74,12 @@ components:
   ghost-action-hover:
     backgroundColor: "{colors.frosting-soft}"
     textColor: "{colors.frosting-ink}"
-  palette-chip:
+  palette-tile:
     backgroundColor: "{colors.surface-0}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.pill}"
-    padding: "9px 16px"
-  palette-chip-selected:
+    rounded: "{rounded.lg}"
+    padding: "8px 8px 10px"
+  palette-tile-selected:
     backgroundColor: "{colors.frosting-soft}"
     textColor: "{colors.ink}"
   caption-card:
@@ -215,11 +215,11 @@ Borders are quiet 1px tinted hairlines when present at all; most edges are carri
 - **Shape:** full pill (999px)
 - **Pill action** (`.pill`, `.kit-chip`, `.footband-cta`): `surface-0` fill, 1px `border`, `shadow-sm`, ink text at 600–700 / 0.9–0.95rem; padding ~9px 16–20px. The workhorse action.
 - **Hover / Focus:** lift `translateY(-1px)` + `shadow-md` over 150ms hard ease-out; focus takes the global pink glow.
-- **Ghost** (`.browse-all`, `.kit-remove`): borderless, `frosting-ink` text, `frosting-soft` fill on hover.
+- **Ghost** (`.browse-all`, `.kit-remove`): borderless, `frosting-ink` text, `frosting-soft` fill on hover. `Browse all styles & effects` lives on beat 03's header row (`.beat-head`, eyebrow left / action right), not on the caption shelf — the drawer it opens holds captions and every palette family, so it must read as the whole beat's escape hatch.
 - **No filled-pink button exists on this surface.** Commitment arrives as the foot band morphing to frosting, not as a pink button.
 
 ### Chips
-- **Palette chip:** pill on `surface-0` with a leading motif mini; selected = `frosting-soft` fill + 2.5px frosting ring. On the shelf the chips sit in **family groups** — a mono group header (`TRANSITIONS`) carries a human placement clause ("play at the cuts inside a clip") so the chip itself needs no family label; the drawer's flat items keep their per-item mono label.
+- **Palette tile:** the caption card one size down — a `surface-0` card (16px radius, 8px pad) with a full-width 16:9 motif **stage** the loop can actually be read on, the name beneath; selected = `frosting-soft` fill + 2.5px frosting ring + the same check badge as a caption card. Tiles sit in an `auto-fill` grid (min 172px, 148px on mobile) so a family with three items gets the same tile size as one with six. On the shelf the tiles sit in **family groups** — a mono group header (`TRANSITIONS`) carries a human placement clause ("play at the cuts inside a clip") so the tile itself needs no family label; the drawer's flat items keep their per-item mono label. (Pill chips with 44×28 minis were retired: the motif was unreadable at that size.)
 - **Tag chip (drawer filters):** mono 0.74rem pill on `surface-1`; selected = `frosting-soft` + frosting border.
 - **Data chip (S1/P1 tags, transcript words):** mono or body 0.6–0.8rem on `surface-2`, 6–8px radius — identity and content, not interactive.
 
@@ -248,7 +248,7 @@ Each beat-01 card carries a working diagram, schematic until the visitor's own a
 A fixed bottom strip on near-opaque `surface-0` with an upward tinted shadow. On run completion it **morphs into the commitment band**: fill goes `frosting`, copy goes bold `ink`, the pink glow deepens, and the pill CTA appears — the page's one full-pink moment.
 
 ### Caption Specimens & Motif Previews (product content, not chrome)
-Caption cards composite each registry style's specimen text over the visitor's own frame behind a breath of dark scrim. The specimen treatments (`.sp-highlight`, `.sp-neon`, `.sp-glitch`, `.sp-gradient`, …) render **third-party caption styles being sold** — they are demonstrated data, exempt from the page's typography and hue rules, and must never leak into the page's own styling. Specimens are word-level spans and **loop their style's character** (karaoke walk, per-word rise, wipe sweep, camera pan, slam-in…); transition and accent items carry **motif previews** (`.motif` / `.m-*`) — A→B over two of the visitor's frames for transitions, a light overlay motif over one frame for accents — as chip minis (44×28) and full stages (58px) in the drawer. A name-keyword motif hit is **clamped to the family's legal set** (transitions ∈ wipe/fade/flip/zoom/glitch, accents ∈ pulse/lockup/trail/cloud) because the element structure is per-family; out-of-family hits fall back to crossfade/pulse. All loops are our rendition of the style, the same claim level as the static specimens. Playback is viewport-gated by IntersectionObserver (`.playing`) so a shelf of loops never taxes the SSE-driven page, and `prefers-reduced-motion` drops every loop to an authored static pose (each motif's 0% frame is legible at rest).
+Caption cards composite each registry style's specimen text over the visitor's own frame behind a breath of dark scrim. The specimen treatments (`.sp-highlight`, `.sp-neon`, `.sp-glitch`, `.sp-gradient`, …) render **third-party caption styles being sold** — they are demonstrated data, exempt from the page's typography and hue rules, and must never leak into the page's own styling. Specimens are word-level spans and **loop their style's character** (karaoke walk, per-word rise, wipe sweep, camera pan, slam-in…); transition and accent items carry **motif previews** (`.motif` / `.m-*`) — A→B over two of the visitor's frames for transitions, a light overlay motif over one frame for accents — as 16:9 tile stages on the shelf and 58px full stages in the drawer. A name-keyword motif hit is **clamped to the family's legal set** (transitions ∈ wipe/fade/flip/zoom/glitch, accents ∈ pulse/lockup/trail/cloud) because the element structure is per-family; out-of-family hits fall back to crossfade/pulse. All loops are our rendition of the style, the same claim level as the static specimens. Playback is viewport-gated by IntersectionObserver (`.playing`) so a shelf of loops never taxes the SSE-driven page, and `prefers-reduced-motion` drops every loop to an authored static pose (each motif's 0% frame is legible at rest).
 
 ### Browse-all Drawer
 A right-edge overlay drawer (search + tag chips + 2-col grid). Browsing unfiltered, the grid is **sectioned by family** — sticky mono headers (`CAPTIONS · 16`) on a `surface-0` zero-alpha fade; any query or tag **flattens** the grid to one result set, because sections fight filters. Caption items carry live specimens, transition/accent items carry motif previews.

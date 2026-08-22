@@ -460,12 +460,16 @@ body.ready::before {
 
 /* ---------- beat 03 · catalog ---------- */
 
+/* the beat's one escape hatch sits on the beat header, not on a shelf — the drawer
+   holds captions AND every palette family, so it must read as the whole beat's */
+.beat-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+.beat-head .eyebrow { margin-bottom: 0; }
 .shelf-head { display: flex; align-items: flex-end; gap: 20px; margin-bottom: 16px; }
 .shelf-head.second { margin-top: 34px; }
 .shelf-title { font-size: 1.35rem; font-weight: 750; letter-spacing: -0.02em; }
 .shelf-sub { font-size: 0.88rem; color: var(--ink-muted); }
 .browse-all {
-  margin-left: auto; flex: none;
+  flex: none;
   display: inline-flex; align-items: center; gap: 7px;
   font: 600 0.9rem var(--font); color: var(--frosting-ink);
   background: none; border: 0; cursor: pointer; padding: 8px 10px; border-radius: var(--radius-sm);
@@ -613,7 +617,7 @@ body.ready::before {
 }
 .caption-name { font-weight: 700; font-size: 0.94rem; }
 .caption-desc { font-size: 0.78rem; color: var(--ink-subtle); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.caption-check {
+.caption-check, .tile-check {
   position: absolute; top: 10px; right: 10px; width: 24px; height: 24px;
   border-radius: 999px; background: var(--frosting); color: var(--ink);
   display: grid; place-items: center;
@@ -631,20 +635,20 @@ body.ready::before {
   font-family: var(--font); font-size: 0.84rem; font-weight: 500;
   letter-spacing: 0; text-transform: none; color: var(--ink-subtle); white-space: pre-wrap;
 }
-.palette-row { display: flex; flex-wrap: wrap; gap: 10px; }
-.palette-chip {
-  display: inline-flex; align-items: center; gap: 9px;
+/* palette picks are tiles, the caption card one size down: a 16:9 motif stage the
+   loop can actually be read on (a 44px mini showed nothing), the name beneath */
+.palette-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(172px, 1fr)); gap: 12px; }
+.palette-tile {
+  position: relative; text-align: left; cursor: pointer;
+  background: var(--surface-0); border: 0; border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm); padding: 8px 8px 10px;
+  display: flex; flex-direction: column; gap: 8px;
   font: 600 0.9rem var(--font); color: var(--ink);
-  background: var(--surface-0); border: 1px solid var(--border);
-  border-radius: 999px; padding: 9px 16px; cursor: pointer;
-  box-shadow: var(--shadow-sm);
   transition: box-shadow var(--fast) var(--ease-out), background var(--fast) var(--ease-out);
 }
-.palette-chip:hover { box-shadow: var(--shadow-md); }
-.palette-chip.selected { background: var(--frosting-soft); box-shadow: var(--shadow-sm), 0 0 0 2.5px var(--frosting); }
-.palette-chip .family { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; color: var(--ink-subtle); }
-.palette-chip.selected .family { color: var(--frosting-ink); }
-.palette-chip.with-motif { padding: 6px 16px 6px 7px; }
+.palette-tile:hover { box-shadow: var(--shadow-md); }
+.palette-tile.selected { background: var(--frosting-soft); box-shadow: var(--shadow-sm), 0 0 0 2.5px var(--frosting); }
+.palette-tile .tile-name { padding: 0 4px; }
 
 /* the fly-to-kit clone: the picked chip itself lifts off, arcs and shrinks into
    the Kit chip — you see exactly what you just added land in the kit */
@@ -663,7 +667,7 @@ body.ready::before {
   position: relative; overflow: hidden; display: block; isolation: isolate;
   background: linear-gradient(160deg, var(--surface-2), var(--surface-3));
 }
-.motif.mini { width: 44px; height: 28px; border-radius: 7px; flex: none; }
+.motif.stage { width: 100%; aspect-ratio: 16 / 9; border-radius: 10px; }
 .motif.full { height: 58px; border-radius: 10px; margin-bottom: 6px; }
 .motif .mf-a, .motif .mf-b { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .motif i.mf-b { background: linear-gradient(200deg, var(--surface-3), var(--surface-2)); }
@@ -783,7 +787,7 @@ body.ready::before {
 .catalog-fallback { color: var(--ink-muted); background: var(--surface-2); border-radius: var(--radius); padding: 14px 18px; font-size: 0.92rem; }
 
 .kit-locked-note { margin-top: 18px; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--mint); }
-.beat.locked .caption-card, .beat.locked .palette-chip { pointer-events: none; opacity: 0.7; }
+.beat.locked .caption-card, .beat.locked .palette-tile { pointer-events: none; opacity: 0.7; }
 
 /* ---------- beats 04 / 05 ---------- */
 
@@ -984,6 +988,8 @@ body.ready::before {
   .rail-tab.current { transform: none; }
   .explainers { grid-template-columns: 1fr; }
   .caption-shelf { grid-template-columns: repeat(2, 1fr); }
+  .palette-row { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); }
+  .beat-head { flex-wrap: wrap; }
   .strip { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .strip-timer { text-align: left; }
   .hero-row { flex-direction: column; }
