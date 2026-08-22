@@ -16,6 +16,12 @@ One standalone 9:16 composition, `index.html` at the project root:
   `<audio>` elements (track 10) carry the sound. NEVER: touch their timing attributes,
   animate their geometry, nest a timed element inside another timed element (0.8.4
   lint error `video_nested_in_timed_element`), or call play/pause/seek on media.
+- **`<script data-cutting-room="prime-media">`** (emitted by the scaffolder, right
+  after the media): pre-seeks every timed `<video>` to its own first frame before its
+  window opens and re-arms it on window exit. The live player reveals and seeks a
+  video in the same instant — without this block viewers see the proxy's frame 0 for
+  2–8 display frames at every shot switch. Keep it verbatim; never add your own
+  play/pause/seek calls.
 - **One registered paused timeline**: `window.__timelines["<id>"] = tl` (GSAP,
   `paused: true`, built inside an IIFE). ALL motion mounts on this timeline at
   composition-time seconds. Never create a second timeline for the composition, never
@@ -45,6 +51,17 @@ One standalone 9:16 composition, `index.html` at the project root:
    components ship it). Always keep a system fallback stack.
 4. Allowlist for animation: transform / opacity / color / background-color / filter /
    clip-path on NON-media elements. Nothing else, nothing on media.
+5. **Two runtimes.** The renderer samples t = k/30 and waits for media; the live
+   player (what the user watches in the Screen) samples at display rate in real time.
+   Anything you add on top of the media must be true at EVERY instant, not only on
+   the 30 fps grid: no holes between consecutive timed windows (a hole is a black
+   frame in the player, invisible to the renderer), nothing that depends on a seek
+   having landed. The per-shot `<video>` windows deliberately overlap by half a
+   frame (each shot tails UNDER its successor; pane `z-index` = shot order; tracks
+   alternate 0/1 ↔ 2/3) — do not "fix" that overlap, do not re-time the windows or
+   change pane z-index to cure something you see in a snapshot. Shot switches are
+   verified on both runtimes by the main thread (`switch-scan` on drafts,
+   `player-probe` on the play server).
 
 ## Palette blocks (the Kit's picks: style.json@2 `palette.{transitions, blocks, treatments, titles}`)
 

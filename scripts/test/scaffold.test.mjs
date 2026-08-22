@@ -210,34 +210,62 @@ const reframedClip = () => ({
   },
 });
 
-test('scaffoldComposition: shot windows carry quarter-frame margins — no boundary ever sits on a sample point', () => {
+test('scaffoldComposition: shot windows leave no hole and tail two frames UNDER the successor', () => {
   const html = scaffoldComposition(reframedClip(), { source: 'assets/clip30.mp4', mediaOffset: 95 });
-  // The runtime shows a clip while start <= t <= start+duration (inclusive, raw float
-  // compare) and samples t = k/30; 1/30 has no exact decimal, so boundary-exact values
-  // round into 1-2 frame black holes at switches (measured on the drafts). Every
-  // window is therefore [f0-0.25, f1-0.75]/30 (final shot ends at (f1-0.25)/30): the
-  // intended frames f0..f1-1 stay covered, boundaries live half-way between samples.
-  // shot 0 starts at the composition origin, covers frames 0..44 (44 + 0.5 pad)
-  assert.match(html, /id="c1-s0"[^>]*data-start="0"[^>]*data-duration="1.4833333333333334"[^>]*data-media-start="5"[^>]*data-track-index="0"/s);
-  // split shot: (45-0.25)/30, covers 45..130, both half panes share the window
-  assert.match(html, /id="c1-s1a"[^>]*data-start="1.4916666666666667"[^>]*data-duration="2.85"[^>]*data-media-start="6.5"[^>]*data-track-index="0"/s);
-  assert.match(html, /id="c1-s1b"[^>]*data-start="1.4916666666666667"[^>]*data-duration="2.85"[^>]*data-media-start="6.5"[^>]*data-track-index="1"/s);
-  // final shot: (131-0.25)/30 start, plain durFrames/30 so it never outlives the root
-  assert.match(html, /id="c1-s2"[^>]*data-start="4.358333333333333"[^>]*data-duration="0.6333333333333333"[^>]*data-media-start="9.366666666666667"/s);
-  // no same-track overlap and no sampled gap: each end sits below the next start,
-  // with the switch sample point strictly inside the successor's window
+  // Two runtimes (reframe.md §The two-runtime law). The renderer samples t = k/30; the
+  // live player samples at display rate (~60 Hz) and reveals a timed <video> in real
+  // time. Windows are [f0-0.25, f1-0.25]/30 (no boundary on a render sample) and every
+  // non-final window keeps a 2-frame TAIL past the successor's start: a hole between
+  // windows is a black frame in the player (measured 11/13 switches), and a freshly
+  // revealed video can paint transparent for one compositor frame (measured on
+  // replays) — under the tail the previous frame shows instead of the background.
+  // Later shots stack above earlier ones (pane z-index = shot order), so the render
+  // sample at f1 — inside the tail — shows the successor, and tracks alternate so the
+  // overlap never lands on one track (lint forbids same-track overlap).
+  // shot 0: origin → (45-0.25)/30 + 2/30 = 46.75/30
+  assert.match(html, /id="c1-s0"[^>]*data-start="0"[^>]*data-duration="1.5583333333333333"[^>]*data-media-start="5"[^>]*data-track-index="0"/s);
+  // split shot: starts (45-0.25)/30, ends (131+1.75)/30, panes on tracks 2/3
+  assert.match(html, /id="c1-s1a"[^>]*data-start="1.4916666666666667"[^>]*data-duration="2.933333333333333"[^>]*data-media-start="6.5"[^>]*data-track-index="2"/s);
+  assert.match(html, /id="c1-s1b"[^>]*data-start="1.4916666666666667"[^>]*data-duration="2.933333333333333"[^>]*data-media-start="6.5"[^>]*data-track-index="3"/s);
+  // final shot: (131-0.25)/30 start, plain (f1-f0)/30 — no tail, never outlives the root
+  assert.match(html, /id="c1-s2"[^>]*data-start="4.358333333333333"[^>]*data-duration="0.6333333333333333"[^>]*data-media-start="9.366666666666667"[^>]*data-track-index="0"/s);
+  // z-order = shot order, on the pane (a stacking context the runtime cannot override)
+  assert.match(html, /<div class="pane" style="[^"]*z-index:1;[^"]*">\s*<video id="c1-s0"/s);
+  assert.match(html, /<div class="pane" style="[^"]*z-index:2;[^"]*">\s*<video id="c1-s1a"/s);
+  assert.match(html, /<div class="pane" style="[^"]*z-index:2;[^"]*">\s*<video id="c1-s1b"/s);
+  assert.match(html, /<div class="pane" style="[^"]*z-index:3;[^"]*">\s*<video id="c1-s2"/s);
   const shots = [...html.matchAll(/<video[^>]*data-start="([\d.]+)" data-duration="([\d.]+)" data-media-start/g)]
     .map((m) => ({ start: Number(m[1]), end: Number(m[1]) + Number(m[2]) }));
   assert.equal(shots.length, 4); // s0, s1a, s1b, s2
-  assert.ok(shots[0].end < shots[1].start, 'no overlap s0/s1');
-  assert.ok(shots[0].end > 44 / 30 && shots[1].start < 45 / 30, 'frames 44 and 45 both covered');
-  assert.ok(shots[3].start < 131 / 30 && shots[1].end > 130 / 30, 'frames 130 and 131 both covered');
+  // tail: each non-final window ends exactly two frames after its successor starts
+  assert.ok(Math.abs((shots[0].end - shots[1].start) - 2 / 30) < 1e-9, 's0 tails 2 frames under s1');
+  assert.ok(Math.abs((shots[1].end - shots[3].start) - 2 / 30) < 1e-9, 's1 tails 2 frames under s2');
+  // the switch sample points stay strictly inside the successor's window
+  assert.ok(shots[1].start < 45 / 30 && shots[0].end > 45 / 30, 'frame 45: successor visible, predecessor tailing under it');
+  assert.ok(shots[3].start < 131 / 30 && shots[1].end > 131 / 30, 'frame 131: successor visible, predecessor tailing under it');
   // exactly one continuous audio element per segment
   assert.match(html, /<audio[^>]*data-start="0"[^>]*data-duration="5"[^>]*data-media-start="5"[^>]*data-track-index="10"/s);
   assert.equal([...html.matchAll(/<audio/g)].length, 1);
   // hyperframes-core data-attributes.md: class="clip" is for div/img — OMIT on <video>
   // (framework manages video visibility directly)
   assert.ok(!/<video[^>]*class="clip"/s.test(html), 'videos carry no clip class');
+});
+
+test('scaffoldComposition: timed videos hold their first frame before their window (prime script)', () => {
+  // The live player reveals a timed <video> and seeks it at the same instant — until
+  // the seek lands (2-8 display frames, measured) the viewer sees whatever frame the
+  // element held: file t=0. The baseline pre-seeks every timed video to its
+  // data-media-start on load and re-arms it when its window closes, so reveal shows
+  // the shot's own first frame and replays/scrub-backs stay clean. The renderer is
+  // unaffected (it seeks in-window media per frame and waits for readiness).
+  const html = scaffoldComposition(reframedClip(), { source: 'assets/clip30.mp4', mediaOffset: 95 });
+  assert.match(html, /<script data-cutting-room="prime-media">/);
+  assert.match(html, /video\[data-media-start\]/);
+  assert.match(html, /addEventListener\('loadedmetadata'/);
+  assert.match(html, /addEventListener\('pause'/);
+  // the plain-segment path (no reframe) carries it too — multi-segment clips switch videos
+  const plain = scaffoldComposition(clip(), { source: 'assets/source.mp4', mediaOffset: 0 });
+  assert.match(plain, /<script data-cutting-room="prime-media">/);
 });
 
 

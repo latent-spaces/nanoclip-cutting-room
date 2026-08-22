@@ -35,13 +35,34 @@ const escapeHtml = (s) => String(s)
 // Product decision: never round grid-valued (1/30) numbers — emit the exact
 // double (String = shortest round-trip). round() below is reserved for 2dp-TRUE
 // values (NanoClip word grid), where it recovers the exact decimal from float noise.
-const gridStart = (f0) => (f0 === 0 ? '0' : String((f0 - 0.25) / 30));
-const gridDur = (durFrames, final) => String((durFrames + (final ? 0 : 0.5)) / 30);
+// Shot windows live on the quarter-frame grid: start (f0 - 0.25)/30 (shot 0 from the
+// origin), end (f1 - 0.25)/30 — no boundary ever sits on a render sample t = k/30, so the
+// render covers frames f0..f1-1 exactly once and the runtime's end-of-window media clamp
+// lands on the shot's true last frame (reframe.md §The two-runtime law). Every non-final
+// window then keeps a two-frame TAIL past its successor's start, UNDER it (pane z-index =
+// shot order, tracks alternate because lint forbids same-track overlap): the live player
+// samples at display rate, not on the render grid — a hole between windows is a black
+// frame there (measured 11/13 switches), and a freshly revealed <video> can paint
+// transparent for one compositor frame (measured on replays); under the tail the previous
+// frame shows instead of the background. Render samples f1, f1+1 fall inside the tail and
+// show the successor (on top), pixels identical to no tail.
+// 2 frames = 66.7 ms: covers a reveal that lands late in a display interval plus the
+// next one or two compositor frames, at 60 Hz and at the ~35 Hz a split page runs at
+// (0.5 frames measured insufficient: one blank slipped 0.7 ms past the tail's end).
+const TAIL_FRAMES = 2;
+const gridStart = (f0) => (f0 === 0 ? 0 : (f0 - 0.25) / 30);
+const gridEnd = (f1) => (f1 - 0.25) / 30;
+const shotWindow = (f0, f1, final) => {
+  const start = gridStart(f0);
+  // non-final: end + tail, as end - start (exact doubles, never rounded); final: the clean
+  // grid ratio — nothing follows it, and it must never outlive the root.
+  const duration = final ? (f0 === 0 ? gridEnd(f1) : (f1 - f0) / 30) : (gridEnd(f1) + TAIL_FRAMES / 30) - start;
+  return { start: String(start), duration: String(duration) };
+};
 
 // Per-shot reframe emission (references/reframe.md, split-spike pattern): every shot
 // gets its own timed element(s) with STATIC px crops inside overflow-hidden panes; the
-// framework's clip timing does all switching (verified frame-exact). Non-final shots
-// end one frame short — clip windows are inclusive at both ends.
+// framework's clip timing does all switching (verified frame-exact on both runtimes).
 const shotMedia = (clip, source, mediaOffset, width, height) => {
   // composition-frame base of each segment, to rebase a shot into proxy media time
   const segBases = [];
@@ -50,22 +71,22 @@ const shotMedia = (clip, source, mediaOffset, width, height) => {
     segBases.push({ base: acc, srcIn: s.src_in });
     acc += Math.round((s.src_out - s.src_in) * 30);
   }
-  const lastF1 = clip.reframe.shots.at(-1).f1;
   return clip.reframe.shots.map((shot, k) => {
     const seg = [...segBases].reverse().find((b) => shot.f0 >= b.base);
     // 2dp-true part noise-stripped, grid part exact — never rounded (see decision above)
     const mediaStart = String(round(seg.srcIn - mediaOffset) + (shot.f0 - seg.base) / 30);
-    const final = shot.f1 === lastF1;
-    const durFrames = final ? shot.f1 - shot.f0 : shot.f1 - shot.f0 - 1;
-    const timing = `data-start="${gridStart(shot.f0)}" data-duration="${gridDur(durFrames, final)}" data-media-start="${mediaStart}"`;
+    const win = shotWindow(shot.f0, shot.f1, k === clip.reframe.shots.length - 1);
+    const timing = `data-start="${win.start}" data-duration="${win.duration}" data-media-start="${mediaStart}"`;
     return shot.panes.map((pane, j) => {
       const split = shot.layout === 'split';
       const paneH = split ? height / 2 : height;
       const paneTop = split && j === 1 ? `${height / 2}px` : '0';
       const id = `${clip.id}-s${k}${split ? 'ab'[j] : ''}`;
       const px = cropPx(pane, { paneW: width, paneH });
-      return `      <div class="pane" style="position:absolute;left:0;top:${paneTop};width:${width}px;height:${paneH}px;overflow:hidden">
-        <video id="${id}" src="${source}" ${timing} data-track-index="${j}" muted playsinline style="position:absolute;width:${px.width}px;height:${px.height}px;left:${px.left}px;top:${px.top}px"></video>
+      // tracks alternate per shot (0/1 then 2/3) so the tail overlap never shares a track
+      const track = (k % 2) * 2 + j;
+      return `      <div class="pane" style="position:absolute;left:0;top:${paneTop};width:${width}px;height:${paneH}px;overflow:hidden;z-index:${k + 1};">
+        <video id="${id}" src="${source}" ${timing} data-track-index="${track}" muted playsinline style="position:absolute;width:${px.width}px;height:${px.height}px;left:${px.left}px;top:${px.top}px"></video>
       </div>`;
     }).join('\n');
   }).join('\n');
@@ -177,6 +198,32 @@ ${captioned ? CAPTION_CSS : ''}    </style>
     >
 ${media}
 ${captioned ? captionMarkup(clip) + '\n' : ''}    </div>
+    <script data-cutting-room="prime-media">
+      // Timed videos hold their FIRST frame before their window opens. The live player
+      // reveals a timed <video> and seeks it in the same instant; until the seek lands
+      // (2-8 display frames, measured) the viewer sees whatever frame the element held —
+      // file t=0 without this. Pre-seek each video to its data-media-start once metadata
+      // is in, and re-arm it when the runtime pauses it outside its window, so replays
+      // and scrub-backs reveal the shot's own first frame too. The renderer is unaffected:
+      // it seeks in-window media per frame and waits for readiness. Keep this block.
+      (function () {
+        var vids = document.querySelectorAll('video[data-media-start]');
+        for (var i = 0; i < vids.length; i++) (function (v) {
+          var ms = parseFloat(v.dataset.mediaStart || '0');
+          var start = parseFloat(v.dataset.start || '0');
+          var end = start + parseFloat(v.dataset.duration || '0');
+          if (!(ms >= 0)) return;
+          var prime = function () { try { if (!v.seeking && Math.abs(v.currentTime - ms) > 0.001) v.currentTime = ms; } catch (e) {} };
+          v.addEventListener('loadedmetadata', function () { if (v.currentTime < 0.001) prime(); });
+          v.addEventListener('pause', function () {
+            var tl = window.__timelines && window.__timelines[document.getElementById('root').dataset.compositionId];
+            var t = tl && typeof tl.time === 'function' ? tl.time() : null;
+            if (t == null || t < start || t > end) prime();
+          });
+          if (v.readyState >= 1 && v.currentTime < 0.001) prime();
+        })(vids[i]);
+      })();
+    </script>
     <script>
       ${timeline}
     </script>

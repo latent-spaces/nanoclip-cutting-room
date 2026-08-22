@@ -19,7 +19,10 @@ your checklist vocabulary). Do not load hyperframes-* skills.
 Inspect every clip — you are looking for what the builders stopped seeing:
 1. `npx hyperframes@0.8.4 check` per clip — must pass; note every warning.
 2. `node <repo>/scripts/switch-scan.mjs <rundir>` — must PASS (render-level
-   switch cleanliness; drafts must exist).
+   switch cleanliness incl. `held-before-cut`; drafts must exist), and
+   `node <repo>/scripts/player-probe.mjs --port <clip's play port> --clip <id>
+   --plan <rundir>/plan.json --replay` per clip — must PASS (the live player is a
+   second runtime: visibility holes and seek-on-reveal only show there).
 3. Snapshots at 3-4 moments per clip (`npx hyperframes@0.8.4 snapshot --at ...`): captions
    legible over the actual footage? active-word highlight sane? reframe crop holds
    the speaking face with headroom? no dead space / half-cut UI?
@@ -35,7 +38,7 @@ ship) / POLISH (ship-optional). Delete any snapshots you created. You change NOT
 ```
 
 **After the report:** main thread fixes BLOCKERs via the owning tools, re-runs the
-gate (check + switch-scan), then `render.mjs --quality high`. POLISH items go to the
+gate (check + switch-scan + player-probe), then `render.mjs --quality high`. POLISH items go to the
 user as choices, not silent work.
 
 **Degraded path (no Agent tool):** the main thread runs the same checklist inline —

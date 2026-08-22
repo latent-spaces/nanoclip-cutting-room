@@ -26,15 +26,17 @@ node scripts/render.mjs --dir <rundir> [--clip <id>] [--quality draft]
 
 check-gated (a failing check stops before any render), ffprobe-verified against the
 plan's frame count on the 30fps grid, stamps `plan.clips[].render`. Draft = iteration
-copy (`<id>-draft.mp4`). After a reframe/timing change, also run
-`node scripts/switch-scan.mjs <rundir>` — switch cleanliness is only visible at
-render level (reframe.md float law).
+copy (`<id>-draft.mp4`). After a reframe/timing change, also run BOTH switch gates —
+the two runtimes fail differently (reframe.md §The two-runtime law):
+`node scripts/switch-scan.mjs <rundir>` (render: ghost/black/held frames) and
+`node scripts/player-probe.mjs --port <play port> --clip <id> --plan <rundir>/plan.json --replay`
+(live player: visibility holes, seek-on-reveal; needs Chrome + playwright-core).
 
 ## 3 · Ship
 
 1. **Finisher** (agents/finisher.md): one light agent, fresh eyes across ALL clips
    before the delivery render — snapshots at caption/switch moments, captions-vs-words
-   sync, contrast, mount integrity, switch-scan. Findings route per §1; re-gate after
+   sync, contrast, mount integrity, switch-scan + player-probe. Findings route per §1; re-gate after
    fixes.
 2. `node scripts/render.mjs --dir <rundir> --quality high` → `<id>-final.mp4` per
    clip, stamped `render.quality: "high"`.

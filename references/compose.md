@@ -62,6 +62,21 @@ id — that timeline is the Composer's mount point. v1 reframe = static center c
   on the same property; and ALWAYS verify overlay motion on rendered frames
   (`render` + ffmpeg frame extraction), not just `snapshot`. Found the hard way on
   caption word highlights (0.08s words vs a 0.12s rise tween).
+- **Two runtimes, two clocks (reframe.md §The two-runtime law).** The renderer samples
+  t = k/30 and waits for media readiness; the live player (play server +
+  `<hyperframes-player>` — the Screen's beat-05 embeds) evaluates visibility at display
+  rate and reveals + seeks a timed `<video>` in the same instant. Measured on the
+  package E2E drafts: a half-frame hole between consecutive shot windows = a BLACK
+  frame in the player at 11/13 switches (never in the render); seek-on-reveal = 2–8
+  display frames of the proxy's frame 0; and the same hole made the RENDER repeat the
+  frame before every cut and drop the shot's last one. Laws: no hole between shot
+  windows — each non-final shot tails half a frame UNDER its successor (pane z-index =
+  shot order, tracks alternate 0/1 ↔ 2/3), which also masks the one-frame transparent
+  first paint a re-revealed video can show on replays; every timed `<video>` holds its
+  own first frame before its window opens (`<script data-cutting-room="prime-media">`,
+  scaffold-emitted, Composers keep it); verification runs on BOTH runtimes —
+  `switch-scan` (+ `held-before-cut`) on drafts, `player-probe --replay` against the
+  play server.
 
 ## 3 · Player handoff (flow stage 7)
 
@@ -114,6 +129,10 @@ real production run.
 - `npx hyperframes@0.8.4 check` gates every render; render itself belongs to the ship
   stage (draft for iteration, `--quality high` for delivery, verify the output file
   exists and probes).
+- **After any timing change (boundary, reframe, rescaffold) or HF bump:** re-render
+  the drafts, then `node scripts/switch-scan.mjs <rundir>` (render) AND
+  `node scripts/player-probe.mjs --port <play port> --clip <id> --plan <rundir>/plan.json
+  --replay` (live player) — the two runtimes fail differently (§2).
 
 ## 5 · Captions
 

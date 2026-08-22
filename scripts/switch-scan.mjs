@@ -4,7 +4,13 @@
 // divisible by 3). Re-run after any timing-emission or HF change:
 //   node scripts/switch-scan.mjs [<rundir>]
 // PASS = every switch shows exactly one big frame-difference (the cut itself), no
-// double-jump (ghost/black frame), no black frames. YDIF via ffmpeg signalstats.
+// double-jump (ghost/black frame), no black frames, and no HELD frame right before the
+// cut (frame f0-1 repeating f0-2 while the shot is in motion = the runtime's
+// end-of-window media clamp landed inside the previous frame — a dup + a dropped
+// frame at every switch; found when shot windows carried a half-frame hole).
+// YDIF via ffmpeg signalstats.
+// NOTE: this scans the RENDER. The live player is a second runtime — gate it with
+// scripts/player-probe.mjs (visibility holes and seek-on-reveal never show here).
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -36,9 +42,14 @@ for (const clip of plan.clips ?? []) {
   // a switch where nothing changes on the switch frame NOR beside it = displaced hole
   const dead = switches.filter((f) => f < vals.length
     && Math.max(vals[f - 1] ?? 0, vals[f], vals[f + 1] ?? 0) < 4);
+  // held frame before the cut: f0-1 repeats f0-2 (YDIF ≈ 0) while the preceding
+  // frames were moving (median YDIF of f0-6..f0-2 ≥ 1) — static footage is skipped
+  const median = (a) => { const b = [...a].sort((x, y) => x - y); return b.length ? b[Math.floor(b.length / 2)] : 0; };
+  const held = switches.filter((f) => f >= 6 && vals[f - 1] < 0.5
+    && median(vals.slice(f - 6, f - 1)) >= 1);
   console.log(`${clip.id}: ${vals.length} frames, ${switches.length} switches — `
-    + `double-jump: [${doubles}] dead: [${dead}]`);
-  if (doubles.length || dead.length) failed = true;
+    + `double-jump: [${doubles}] dead: [${dead}] held-before-cut: [${held}]`);
+  if (doubles.length || dead.length || held.length) failed = true;
 }
-console.log(failed ? 'FAIL — ghost/black frames at the listed switches' : 'PASS — all switches single-frame clean');
+console.log(failed ? 'FAIL — ghost/black/held frames at the listed switches' : 'PASS — all switches single-frame clean');
 process.exit(failed ? 1 : 0);

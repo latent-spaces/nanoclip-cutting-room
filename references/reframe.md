@@ -43,9 +43,9 @@ below. THIS DOCUMENT IS NOW LAW.
    (`object-fit: cover` + `object-position` + pane geometry), and layout switching is the
    framework's own clip timing** — each shot's element(s) carry `data-start`/`data-duration`
    for exactly that shot (solo = one full-frame element; split = two static half-pane
-   elements on separate tracks), with the earlier shot ending one frame short (end = next
-   start − 1/30; clip windows are inclusive at both ends). No reframe animation code at
-   all; the registered paused timeline stays empty for the Composer's other motion. Cost
+   elements on separate tracks), windows on the quarter-frame grid with NO hole between
+   them — each shot tails half a frame under its successor (see the two-runtime law
+   below). No reframe animation code at all; the registered paused timeline stays empty for the Composer's other motion. Cost
    measured: render time scales with total pane-seconds (4s solo 11.2s vs solo+split
    21.4s, draft). Current HF (0.8.3) ships NO native reframe/crop primitive (checked:
    registry catalog 373 items, media-use = offline file ops) — this composition-level
@@ -83,17 +83,84 @@ not precision loss. (c) `<video>` elements carry NO `class="clip"` (hyperframes-
 data-attributes.md: clip class is for div/img; the framework manages video visibility
 directly) — verified: check passes, all switches scan clean, zero black intervals.**
 
-The fix (scaffold.mjs `gridStart`/`gridDur`): windows carry **quarter-frame margins** —
-start = (f0−0.25)/30, non-final end = (f1−0.75)/30 (duration durFrames+0.5), final end
-= (f1−0.25)/30 — so the intended frames f0..f1−1 stay covered and no window edge ever
-sits on a sample point, immune to rounding/ulp/comparison semantics. Bonus: media
-seeks now land mid-frame-interval instead of on a PTS boundary — the classic
-"one frame less, one frame more" media flip can't trigger either.
+The fix (scaffold.mjs `gridStart`/`gridEnd`/`shotWindow`): every shot window starts at
+**(f0−0.25)/30** (shot 0 at the origin) and its render-relevant end is **(f1−0.25)/30**
+— the intended frames f0..f1−1 stay covered and no window edge ever sits on a render
+sample point, immune to rounding/ulp/comparison semantics. Media seeks at a shot start
+land mid-frame-interval (quarter frame in), so the classic "one frame less, one frame
+more" flip can't trigger. Non-final windows then run half a frame longer, UNDER the
+successor — the two-runtime law below says why.
 
-**Verification is render-level, not preview-level:** `node scripts/switch-scan.mjs
-[<rundir>]` — YDIF profile of each draft; PASS = every switch is a single big
-frame-difference, no double-jump (ghost/black), no dead switch. Re-run after any
-timing-emission change or HF upgrade (alongside the two spikes).
+## The two-runtime law (third real glitch report — black frames in the player, LAW)
+
+A composition runs on TWO runtimes and they disagree exactly at shot switches:
+
+- **The renderer** samples t = k/30 on the grid and waits for media readiness
+  (`readyState ≥ HAVE_CURRENT_DATA`) before every capture.
+- **The live player** (play server + `<hyperframes-player>`, i.e. the Screen's beat-05
+  embeds and the owner's tab) evaluates visibility at DISPLAY rate (rAF ≈ 60 Hz, off
+  the grid) and reveals a timed `<video>` and seeks it in the same instant, in real time.
+
+Measured on the first version of the margins (start −0.25, non-final end −0.75 = a
+16.7 ms hole between consecutive windows), with scripts/player-probe.mjs:
+
+1. **Hole → black frame.** A 60 Hz sample landed inside the hole at 11/13 switches:
+   no video element visible for one tick, the root background paints — one fully black
+   display frame per switch. The render never samples the hole (k/30 is never inside
+   it), so switch-scan/switch-lab/blackdetect were all clean. **Law: no hole between
+   consecutive shot windows, on any clock.** (Contiguous windows — end = next start —
+   were measured clean on first play, 76/76 reveals; HF's own idiom for sequential
+   clips is the same: `data-start="<prev-id>"`, hyperframes-core tracks-and-clips.md.)
+2. **Seek-on-reveal → wrong frame.** Before its window opens a timed video sits at
+   file t=0 (the runtime seeks only in-window media). At reveal it is shown AND seeked
+   to `data-media-start`; the seek takes 33–139 ms (2–8 display frames, not GOP-bound —
+   the proxies already carry a keyframe at every cut) during which the viewer sees the
+   frame the element held: the proxy's frame 0 (the pad, whoever was on camera 5 s
+   before the clip). **Law: every timed `<video>` holds its own first frame before its
+   window opens.** scaffold.mjs emits `<script data-cutting-room="prime-media">`: on
+   `loadedmetadata` each video pre-seeks to its `data-media-start`; when the runtime
+   pauses it outside its window (window exit, composition end) it re-arms to the same
+   frame, so replays and scrub-backs reveal correctly too. Measured after the fix: the
+   incoming element is `readyState 4`, not seeking, at `media-start + 1 ms` on every
+   reveal, and the runtime does not re-seek (the delta is under its tolerance). The
+   renderer is unaffected — it seeks in-window media per frame and waits. **Composers
+   keep this block; a rescaffold re-emits it.**
+3. **The hole also broke the RENDER, silently.** The runtime clamps a window's media
+   time at `duration − 1/fps` on its last sampled frame; with the −0.75 end that clamp
+   landed inside the previous frame → frame f0−1 REPEATED f0−2 and the shot's true last
+   frame was dropped: a 1-frame freeze + skip at every cut (c1 11/13, c2 3/11, c3
+   13/24 on the package E2E drafts). YDIF/histogram scanners read "held frame, then one
+   clean jump" as clean. With the end at (f1−0.25)/30 (+ tail) the last fully-visible
+   sample is no longer clamped and shows the shot's true last frame (verified against
+   the proxy frames: 580, 581, 582 — not 580, 580, 582).
+4. **Transparent first paint on re-reveal → the half-frame TAIL.** With holes closed
+   and videos primed, first play measured clean (76/76 reveals across four
+   compositions). On REPLAY (seek back after a window had played and closed) the
+   freshly revealed element occasionally paints nothing for ONE compositor frame
+   (4/89 reveals): JS already sees the right frame (`readyState 4`, canvas luma of the
+   shot's first frame) but the compositor has no surface yet — with the root painted
+   magenta the blank frame was magenta, i.e. the element is transparent, not black.
+   **Law: every non-final shot window keeps a 0.5-frame tail past its successor's start,
+   UNDER it** — pane `z-index` = shot order (a stacking context the runtime's track
+   z-ordering cannot override), `data-track-index` alternates 0/1 ↔ 2/3 per shot
+   because lint forbids same-track overlap (overlap on different tracks is the
+   sanctioned crossfade idiom). A transparent first paint now shows the previous
+   shot's last frame for 16 ms (a one-display-frame-late cut, invisible) instead of
+   the background. Render sample f1 falls inside the tail and shows the successor on
+   top — pixels identical to no tail; one extra decoded frame per switch.
+
+**Verification is render-level AND player-level — both, every time the timing emission
+or HF changes:**
+
+- `node scripts/switch-scan.mjs <rundir>` — YDIF profile of each draft; PASS = every
+  switch is a single big frame-difference, no double-jump (ghost/black), no dead
+  switch, **and no held frame before the cut** (`held-before-cut`: f0−1 repeats f0−2
+  while the preceding frames move). Then `switch-lab` for the flagged seams.
+- `node scripts/player-probe.mjs --port <play port> --clip <id> --plan <rundir>/plan.json
+  --replay` — real Chrome against the play server: per switch, no sample with zero
+  visible videos, incoming element ready (not seeking) at first reveal, no luma dip in
+  the compositor screencast; `--replay` repeats the pass after `seek(0)` to cover the
+  re-arm path. Needs Chrome + playwright-core on the machine.
 
 Per shot (between consecutive local cuts inside the clip window): the active speaker =
 plan cast person speaking during the shot (digest turns); their face box = the payload's
