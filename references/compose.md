@@ -178,13 +178,39 @@ only source. The laws:
 
 ## 6 · Composer
 
-One agent per scaffolded clip (agents/composer.md has the spawn prompt, steering, and
-degraded path): restyles the §5 caption block toward the Kit pick, wires the style.json
-palette blocks, resolves check warnings, loops lint → check → snapshot → render-probe.
-Each Composer reads ONLY references/compose-short.md — the distilled composition
-contract (root/media ownership, the one registered timeline, determinism laws incl.
-the monotonic-render overlap rule, palette wiring, the loop, hard boundaries). It owns
-`compose/<id>/` + `plan.clips[i].composition` and nothing else; boundary/timing needs
-come back as report items. **Compose start = Kit checkout:** if style.json exists,
-set `"locked": true` before spawning (server 409s further edits); nothing picked →
-defaults, said in chat. Parallelism ≤3 concurrent Composers.
+**Agent type `composer`** — a registered subagent (`agents/composer.md`) when the
+skill is installed as a plugin or from `~/.claude/skills/`. If that type is not
+registered in this session, spawn `general-purpose` instead and paste
+`agents/composer.md`'s body into the prompt — same laws either way.
+
+One Composer per `proposed`/`approved` clip whose `composition.status` is
+`scaffolded`; **parallelism ≤3 concurrent**. It restyles the §5 caption block toward
+the Kit pick, wires the style.json palette blocks, resolves check warnings, loops
+lint → check → snapshot → render-probe. Each Composer reads ONLY
+references/compose-short.md — the distilled composition contract (root/media
+ownership, the one registered timeline, determinism laws incl. the monotonic-render
+overlap rule, palette wiring, the loop, hard boundaries). It owns `compose/<id>/`
+and nothing else; boundary/timing needs come back as report items.
+
+**Compose start = Kit checkout:** if style.json exists in the rundir, set
+`"locked": true` in it before the first spawn (chat-level write — the screen's
+server then 409s further edits); nothing picked → defaults, said in chat.
+
+**Spawn prompt (fill the brackets):** clip `<id>` ("<title>", hook `<hook>`),
+project dir `<rundir>/compose/<id>`, skill folder `<skill folder>`, Kit picks
+(caption style = `<caption_block or "none picked — default">`, palette transitions
+= `<list or none>`, palette blocks = `<list or none>`), and plan path
+`<rundir>/plan.json` marked READ ONLY.
+
+**One writer, no race.** `plan.json` is read-only for Composers; when one reports
+PASS the **main thread** stamps `plan.clips[i].composition.status = "composed"`
+itself. `render.mjs` renders any stamped composition; `scaffold.mjs build` on a
+composed clip keeps `index.html.prev` and flips the status back (restyle debt,
+iterate.md §1).
+
+**Steering.** While a clip's Composer is alive, route "change c2's hook/look" edits
+to it via SendMessage — its context is already loaded. After it exits, the main
+thread edits `index.html` directly (§4 iteration contract).
+
+**Degraded path (no Agent tool):** the main thread does the same job inline, one
+clip at a time, reading compose-short.md itself — slower, same laws, disclose it.

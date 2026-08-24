@@ -1,0 +1,26 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "nanoclip-cutting-room",
+  "version": "0.1.0",
+  "description": "Turn long footage into vertical shorts you'd actually post. You talk; it cuts, reframes, captions, renders.",
+  "author": {
+    "name": "Oron Anschel",
+    "email": "oronanschel@gmail.com"
+  },
+  "homepage": "https://nanoclip.ai",
+  "repository": "https://github.com/latent-spaces/nanoclip-cutting-room",
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "shorts",
+    "clips",
+    "captions",
+    "reframe",
+    "podcast",
+    "nanoclip",
+    "hyperframes"
+  ],
+  "skills": [
+    "./"
+  ]
+}

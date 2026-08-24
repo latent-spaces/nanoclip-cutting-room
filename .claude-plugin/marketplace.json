@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "nanoclip",
+  "description": "The NanoClip cutting room — turn long footage into ready-to-post vertical shorts inside Claude Code.",
+  "owner": {
+    "name": "Oron Anschel",
+    "email": "oronanschel@gmail.com",
+    "url": "https://github.com/latent-spaces"
+  },
+  "plugins": [
+    {
+      "name": "nanoclip-cutting-room",
+      "source": "./",
+      "description": "Turn long footage into vertical shorts you'd actually post. Editorial pass picks the hook, active-speaker reframing follows who is talking, word-timed captions, local render — with a spend gate in cents before anything runs.",
+      "category": "design"
+    }
+  ]
+}

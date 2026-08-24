@@ -24,4 +24,5 @@ costs no tokens. Unit tests ride with each script: `node --test 'scripts/test/*.
 | `render.mjs` | check-gated local render: `hyperframes check` must pass per clip, then `render --fps 30` (draft → `<id>-draft.mp4`, high → `<id>-final.mp4`), output ffprobe-verified against the plan's frame count, `plan.clips[].render` stamped |
 
 The page itself lives in `screen/` (index.html + style.css + app.js + lib.mjs; lib is
-node-testable pure logic). Agent definitions (Composer, Finisher) live in `agents/`.
+node-testable pure logic). Subagent definitions (`composer`, `finisher`) live in
+`agents/` — registered agent types when the skill is installed as a plugin.

@@ -34,10 +34,17 @@ the two runtimes fail differently (reframe.md §The two-runtime law):
 
 ## 3 · Ship
 
-1. **Finisher** (agents/finisher.md): one light agent, fresh eyes across ALL clips
-   before the delivery render — snapshots at caption/switch moments, captions-vs-words
-   sync, contrast, mount integrity, switch-scan + player-probe. Findings route per §1; re-gate after
-   fixes.
+1. **Finisher** — agent type `finisher`, a registered subagent (`agents/finisher.md`)
+   when the skill is installed as a plugin or from `~/.claude/skills/`; if that type is
+   not registered in this session, spawn `general-purpose` and paste the file's body
+   into the prompt. Exactly one, after every draft is check-green and the user said
+   ship; skip only if nothing changed since the last Finisher pass. Fresh eyes across
+   ALL clips before the delivery render — snapshots at caption/switch moments,
+   captions-vs-words sync, contrast, mount integrity, switch-scan + player-probe.
+   Spawn prompt gives it the rundir, the skill folder, and every clip's id/title/hook.
+   It reports and fixes nothing. The main thread fixes BLOCKERs via the owning tools
+   (§1 routing), re-runs the gate (check + switch-scan + player-probe), then renders.
+   POLISH items go to the user as choices, not silent work.
 2. `node scripts/render.mjs --dir <rundir> --quality high` → `<id>-final.mp4` per
    clip, stamped `render.quality: "high"`.
 3. Deliver: hand the user the three files (chat message with paths/attachments +
@@ -51,6 +58,8 @@ the two runtimes fail differently (reframe.md §The two-runtime law):
 ## 4 · Degraded paths
 
 No Agent tool → the main thread runs the Composer/Finisher playbooks inline, one clip
-at a time (disclose it). No live player (headless) → snapshots + drafts are the review
+at a time (disclose it). For the Finisher that only counts after a context break — a
+fresh session, or an explicit re-read of the files — or the "fresh eyes" premise is
+fiction; say which way it ran. No live player (headless) → snapshots + drafts are the review
 surface. A dead player process (machine restart) → relaunch per compose.md §3; check
 liveness before handing a URL.
