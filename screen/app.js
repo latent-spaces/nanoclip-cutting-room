@@ -400,7 +400,7 @@ function renderHero() {
   }
 }
 
-// ---------- beats 04 / 05 + foot band ----------
+// ---------- beat 04 + foot band ----------
 
 function renderEnd() {
   if (!state) return;

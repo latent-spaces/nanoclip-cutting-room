@@ -70,7 +70,7 @@ id — that timeline is the Composer's mount point. v1 reframe = static center c
   caption word highlights (0.08s words vs a 0.12s rise tween).
 - **Two runtimes, two clocks (reframe.md §The two-runtime law).** The renderer samples
   t = k/30 and waits for media readiness; the live player (play server +
-  `<hyperframes-player>` — the Screen's beat-05 embeds) evaluates visibility at display
+  `<hyperframes-player>` — the Screen's clips-beat embeds) evaluates visibility at display
   rate and reveals + seeks a timed `<video>` in the same instant. Measured on the
   package E2E drafts: a half-frame hole between consecutive shot windows = a BLACK
   frame in the player at 11/13 switches (never in the render); seek-on-reveal = 2–8
@@ -112,7 +112,7 @@ correct). Pointing `src` at the RAW composition file (e.g. the screen server's
 `/run/compose/<id>/index.html`) is NOT viable: the timeline runs but media stays at
 file t=0 (no runtime, nothing manages media). So the embed surface = the play server
 (component src, or an iframe of its page). **A locked product decision reversed the
-earlier own-tab-only plan: the clips now embed IN the screen's beat 05** — `announce.mjs --urls
+earlier own-tab-only plan: the clips now embed IN the screen's clips beat** — `announce.mjs --urls
 <u1,u2,...>` lands a player url per clip card and the page mounts
 `<hyperframes-player src="<url>/composition/index.html">` (loading `<url>/player.js`
 once). The pink band's "Open preview" own-tab CTA remains as the secondary path.

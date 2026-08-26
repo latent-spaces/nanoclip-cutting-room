@@ -177,11 +177,11 @@ Weights are variable and fractional where it matters (640, 650, 750); emphasis c
 
 ## Layout
 
-A single desktop-first page: a `minmax(0, 1fr) 236px` grid capped at 1320px, 34px gutter, 26–28px page padding. The left column stacks five numbered beats separated by a 92px rhythm; the right column is the always-visible progress rail, sticky at `top: 76px` beneath the sticky top bar. A fixed foot band holds the bottom edge (body reserves 72px for it).
+A single desktop-first page: a `minmax(0, 1fr) 236px` grid capped at 1320px, 34px gutter, 26–28px page padding. The left column stacks four numbered beats separated by a 92px rhythm; the right column is the always-visible progress rail, sticky at `top: 76px` beneath the sticky top bar. A fixed foot band holds the bottom edge (body reserves 72px for it).
 
 Density is airy: cards pad 14–22px, grids gap 14–18px, related blocks gap 18px. Card interiors are the only dense zones (data chips, film strips), and overflow inside them fades out via zero-alpha masks rather than clipping hard or widening the page.
 
-The ground does layout work too: `body` carries the beat-to-beat seam ramp (five plateaus drifting hue 335 → 352 → 322 → 344 → 355), and two ambient radial lobes of the band paint once on a fixed `body::before` layer — never `background-attachment: fixed`, which would repaint the world every frame.
+The ground does layout work too: `body` carries the beat-to-beat seam ramp (four plateaus drifting hue 335 → 352 → 322 → 355), and two ambient radial lobes of the band paint once on a fixed `body::before` layer — never `background-attachment: fixed`, which would repaint the world every frame.
 
 Below **1020px** the page becomes one column: the rail moves above the content as a horizontally scrolling tab strip (no popped tab), explainers and strips stack to one column, the caption shelf drops to two, and the tagline hides.
 

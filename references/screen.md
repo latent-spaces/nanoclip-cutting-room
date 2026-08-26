@@ -91,8 +91,8 @@ a real extraction from the user's own source under `cutting-room/thumbs/`):
 
 ## The page (what the user sees)
 
-Five beats, one story: `01 WHAT NANOCLIP SEES → 02 WORKING ON YOUR FOOTAGE → 03 YOU
-CHOOSE THE LOOK → 04 FINDING THE MOMENTS → 05 YOUR CLIPS`. The right rail is the source
+Four beats, one story: `01 WHAT NANOCLIP SEES → 02 WORKING ON YOUR FOOTAGE → 03 YOU
+CHOOSE THE LOOK → 04 YOUR CLIPS`. The right rail is the source
 of truth (one popped tab, live timers); the pink chase-light is the reveal boundary in
 the running strip; the Kit cart in the header IS `style.json` rendered — caption style
 is a single replace-on-add slot, palette accumulates, every change POSTs, no submit.
@@ -135,10 +135,10 @@ still catalog@1).
 
 ## Capturing the page (process shots, README media)
 
-Capture by ELEMENT, never by scroll offset: beat 05 embeds the clip players
+Capture by ELEMENT, never by scroll offset: beat 04 embeds the clip players
 (iframes that load async and resize) — a fixed `clip:{y}` or `scrollTo(y)` taken before
-they settle lands on the wrong beat. Wait for `#beat-5 iframe` to be attached and
-`networkidle`, then `locator('#beat-5').screenshot()` (playwright) — the element's own
+they settle lands on the wrong beat. Wait for `#beat-clips iframe` to be attached and
+`networkidle`, then `locator('#beat-clips').screenshot()` (playwright) — the element's own
 box at capture time. Full-page shots are fine only before clips land.
 
 ## Dev & demo

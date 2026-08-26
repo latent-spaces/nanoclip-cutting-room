@@ -55,14 +55,12 @@ body {
      next. Plateaus hold each beat; ~6% of a full page ≈ a 230px ramp. */
   background: linear-gradient(to bottom,
     oklch(96.5% 0.018 335) 0%,
-    oklch(96.5% 0.018 335) 13%,
-    oklch(95.6% 0.032 352) 19%,
-    oklch(95.6% 0.032 352) 36%,
-    oklch(96.8% 0.024 322) 42%,
-    oklch(96.8% 0.024 322) 60%,
-    oklch(96% 0.03 344) 66%,
-    oklch(96% 0.03 344) 84%,
-    oklch(95.4% 0.035 355) 96%,
+    oklch(96.5% 0.018 335) 16%,
+    oklch(95.6% 0.032 352) 22%,
+    oklch(95.6% 0.032 352) 46%,
+    oklch(96.8% 0.024 322) 52%,
+    oklch(96.8% 0.024 322) 76%,
+    oklch(95.4% 0.035 355) 82%,
     oklch(95.4% 0.035 355) 100%);
   background-color: var(--surface-1);
   min-height: 100vh;
@@ -789,19 +787,13 @@ body.ready::before {
 .kit-locked-note { margin-top: 18px; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--mint); }
 .beat.locked .caption-card, .beat.locked .palette-tile { pointer-events: none; opacity: 0.7; }
 
-/* ---------- beats 04 / 05 ---------- */
+/* ---------- beat 04 ---------- */
 
-.cut-zone, .clips-zone {
+.clips-zone {
   border: 1.5px dashed var(--border-strong); border-radius: var(--radius-lg);
   padding: 26px; display: grid; gap: 16px; place-items: center;
   background: oklch(98.5% 0.008 340 / 0.45);
 }
-.cut-placeholders { display: flex; gap: 12px; width: 100%; }
-.cut-slot {
-  flex: 1; height: 74px; border-radius: 12px; border: 1.5px dashed var(--border-strong);
-  display: grid; place-items: center;
-}
-.cut-slot::after { content: "✦"; color: var(--border-strong); font-size: 0.9rem; }
 .zone-note { font-size: 0.68rem; letter-spacing: 0.2em; color: var(--ink-subtle); text-align: center; }
 .next-line { margin-top: 16px; font-size: 0.9rem; color: var(--ink-muted); text-align: center; }
 .next-line strong { color: var(--ink); font-weight: 650; letter-spacing: 0.01em; }
@@ -966,8 +958,7 @@ body.ready::before {
 .beat, .topbar, .footband { animation: rise 600ms var(--ease-out) backwards; }
 .beat#beat-2 { animation-delay: 60ms; }
 .beat#beat-3 { animation-delay: 120ms; }
-.beat#beat-4 { animation-delay: 180ms; }
-.beat#beat-5 { animation-delay: 220ms; }
+.beat#beat-clips { animation-delay: 180ms; }
 @keyframes rise { from { transform: translateY(16px); opacity: 0; } }
 
 .develop { animation: develop 150ms var(--ease-out) backwards; }

@@ -108,8 +108,8 @@ A composition runs on TWO runtimes and they disagree exactly at shot switches:
 
 - **The renderer** samples t = k/30 on the grid and waits for media readiness
   (`readyState ≥ HAVE_CURRENT_DATA`) before every capture.
-- **The live player** (play server + `<hyperframes-player>`, i.e. the Screen's beat-05
-  embeds and the owner's tab) evaluates visibility at DISPLAY rate (rAF ≈ 60 Hz, off
+- **The live player** (play server + `<hyperframes-player>`, i.e. the Screen's clips
+  beat embeds and the owner's tab) evaluates visibility at DISPLAY rate (rAF ≈ 60 Hz, off
   the grid) and reveals a timed `<video>` and seeks it in the same instant, in real time.
 
 Measured on the first version of the margins (start −0.25, non-final end −0.75 = a

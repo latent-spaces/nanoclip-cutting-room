@@ -24,7 +24,7 @@ returns to chat ready to steer the cut.
 FIRST VIEWPORT: header (wordmark · beta · Your kit) over eyebrow 01 + "This is
 what NanoClip sees in your footage." + three explainer cards + nanoclip.ai pill;
 the progress rail rides the right edge, whole run visible, current stage popped.
-FORM: Storyboard Rows — a locked design decision; five numbered beats read as
+FORM: Storyboard Rows — a locked design decision; four numbered beats read as
 one sentence, strips fill with real artifacts left-to-right, the pink
 chase-light is the reveal boundary.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the
@@ -183,20 +183,10 @@ finish review, the verdict, and DESIGN.md.
       <p class="catalog-fallback" id="catalog-fallback" hidden>The catalog couldn't load — the registry is unreachable. Pick styles in chat instead; everything else keeps working.</p>
     </section>
 
-    <!-- 04 · beat four: the cut -->
-    <section class="beat" id="beat-4">
-      <p class="eyebrow mono"><span class="eyebrow-num">04</span><span class="eyebrow-sep">·</span>FINDING THE MOMENTS</p>
-      <div class="cut-zone" id="cut-zone">
-        <div class="cut-placeholders" aria-hidden="true">
-          <span class="cut-slot"></span><span class="cut-slot"></span><span class="cut-slot"></span><span class="cut-slot"></span><span class="cut-slot"></span>
-        </div>
-        <p class="zone-note mono">WE WILL PICK THE BEST MOMENTS</p>
-      </div>
-    </section>
-
-    <!-- 05 · beat five: the clips -->
-    <section class="beat" id="beat-5">
-      <p class="eyebrow mono"><span class="eyebrow-num">05</span><span class="eyebrow-sep">·</span>YOUR CLIPS</p>
+    <!-- 04 · beat four: the clips. Semantic id on purpose — the capture recipe
+         and any external selector must survive a beat being added or removed. -->
+    <section class="beat" id="beat-clips">
+      <p class="eyebrow mono"><span class="eyebrow-num">04</span><span class="eyebrow-sep">·</span>YOUR CLIPS</p>
       <div class="clips-zone" id="clips-zone">
         <p class="zone-note mono">WHEN YOUR CLIPS ARE READY, THIS TURNS INTO YOUR PREVIEW.</p>
       </div>
